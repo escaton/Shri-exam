@@ -5,8 +5,121 @@
 }
 
 body {
-	background:#333;
-	color:#fff;
+	background:#fff url(../pics/background.png);
+	color:#333;
 	padding: 0 0px 40px 0px;
 	font: 0.8em Arial,Helvetica,sans-serif;
+}
+
+.header {
+	border:0px solid red;
+	background: rgb(255,255,255);
+	box-shadow: #000 0px 5px 10px;
+	height:40px;
+}
+
+.shedule {
+	border: 0px solid red;
+	height:400px;
+	margin:80px auto 0 auto;
+	width: 996px;
+	padding: 0px 40px 32px 40px;
+	position: relative;
+}
+
+.shedule_nav {
+	background: #ccc;
+	box-shadow:0 0px 5px #333;
+	height: 60px;
+	width:60px;
+	position: absolute;
+	top:50%;
+	margin-top:-30px;
+	cursor:pointer;
+}
+
+.shedule_nav_left {
+	left:0;
+	border-radius: 50% 0 0 50%;
+}
+
+.shedule_nav_right {
+	right:0;
+	border-radius: 0 50% 50% 0;
+}
+
+.shedule_body {
+	border:1px solid #555;
+	border-radius: 0px;
+	box-shadow: inset 0 10px 10px -10px #000, inset 0 -10px 10px -10px #000, 0 0 40px -10px #1F354F;
+	background:#ccc url(../pics/grid.png);
+	height: 100%;
+	padding-top:30px;
+	position:relative;
+	overflow:hidden;
+}
+
+.shedule_day_container {
+	border:0px solid red;
+	height:100%;
+	width:2000px;
+	position:relative;
+}
+
+.shedule_day_col {
+	height:100%;
+	width:142px;
+	-moz-box-sizing:border-box;
+	box-sizing:border-box;
+	float:left;
+	border: 0px dotted #777;
+	border-width: 1px 0 0 1px;
+	position:relative;
+}
+
+.shedule_day_weekend {
+	background:rgba(255,0,0,0.16);
+}
+
+.shedule_day_current {
+	background:rgba(0,0,255,0.16);
+}
+
+.shedule_day_header {
+	border:0px solid red;
+	font-size:16px;
+	height:20px;
+	width:100%;
+	padding:0px 0;
+	position:absolute;
+	top:-20px;
+	left:0px;
+}
+
+.shedule_day_weekend .shedule_day_header {
+	color:#f00;
+}
+
+.shedule_day_current .shedule_day_header {
+	color:#00f;
+}
+
+.shedule_item {
+	width:100%;
+	-moz-box-sizing:border-box;
+	box-sizing:border-box;
+	height:30%;	
+	border:1px solid #4A4B7D;
+	border-radius: 5px;
+	box-shadow: inset 0px 0px 5px 0px #fff;
+	background: #f0f9ff; /* Old browsers */
+	/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2YwZjlmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjQ3JSIgc3RvcC1jb2xvcj0iI2NiZWJmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNhMWRiZmYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(top,  #f0f9ff 0%, #cbebff 47%, #a1dbff 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f0f9ff), color-stop(47%,#cbebff), color-stop(100%,#a1dbff)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #f0f9ff 0%,#cbebff 47%,#a1dbff 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #f0f9ff 0%,#cbebff 47%,#a1dbff 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #f0f9ff 0%,#cbebff 47%,#a1dbff 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #f0f9ff 0%,#cbebff 47%,#a1dbff 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f0f9ff', endColorstr='#a1dbff',GradientType=0 ); /* IE6-8 */
 }
