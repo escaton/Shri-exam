@@ -1,4 +1,6 @@
 $('HTML').addClass('JS');
-$(document).ready(function() {
-
+$(function() {
+	if (!ShriCalendar) {
+		
+	}
 });
