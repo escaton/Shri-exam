@@ -7,17 +7,26 @@
 		<link rel="stylesheet" href="css/style.css">
 		<link rel="stylesheet" href="css/print_style.css" media="print">
 		<script src="scripts/jquery-1.8.0.js"></script>
+		<script src="scripts/jquery-ui-1.8.24.custom.min.js"></script>
+		<script src="scripts/jquery.ui.datepicker-ru.js"></script>
 		<script src="scripts/index.js"></script>
 	</head>
 	<body>
 		<div class="header">
 		</div>
 		<div class="schedule_container">
+			<div class="schedule_empty">
+				<span class="schedule_empty_message">Расписания еще нет</span>
+				<span class="schedule_create_new">+</span>
+				<div class="schedule_create_form">
+					<input class="schedule_start_date datepicker" type="text" /> — <input class="schedule_end_date datepicker" type="text" />
+					<div class="schedule_create_form_controls">
+						<a href="#" class="schedule_create_form_accept">Создать</a>
+						<a href="#" class="schedule_create_form_cancel">Отмена</a>
+					</div>
+				</div>				
+			</div>
 			<div class="schedule">
-				<div class="schedule_empty">
-					<span class="schedule_empty_text">Расписания еще нет</span>
-					<span class="schedule_add_new">+</span>					
-				</div>
 				<div class="schedule_nav schedule_nav_left">
 				</div>
 				<div class="schedule_nav schedule_nav_right">
