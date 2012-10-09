@@ -11,40 +11,6 @@
 	display: block;
 }
 
-.schedule_create_new {
-	font-size: 100px;
-	color:#415F96;
-	cursor:pointer;
-}
-
-.schedule_create_new:hover {
-	color:#ccc;
-}
-
-.schedule_create_form {
-	margin-top:40px;
-	border:0px solid red;
-	font-size:20px;
-	display: none;
-}
-
-.schedule_create_form_controls {
-	margin-top:40px;
-	font-size:16px;
-}
-
-.schedule_create_form_controls a {
-	margin:0 10px;
-	color:#ccc;
-	border-bottom: 1px dotted #ccc;
-	text-decoration:none;
-}
-
-.schedule_create_form_controls a:hover {
-	color:#f00;
-	border-bottom: 1px dotted #f00;
-}
-
 .schedule {
 	border: 0px solid red;
 	height:400px;

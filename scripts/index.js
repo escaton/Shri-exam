@@ -40,7 +40,11 @@ $(function() {
 					if (week == weeksToCurrent && dayInWeek == daysToCurrent) day.addClass('schedule_day_current');
 					if ((week == 0 && dayInWeek < startDateDay) || (week == weeks-1 && dayInWeek > endDateDay)) {
 						day.addClass('schedule_day_skip');
-					};
+					} else {
+						var add_control = $('<div>').text('+');
+						add_control.addClass('admin_schedule_add_event');
+						day.append(add_control);
+					}
 					day
 						.append(day_header)
 						.appendTo(schedule_day_container);
@@ -72,28 +76,28 @@ $(function() {
 			schedule.fadeIn(200);
 		};
 		if (!store['Schedule']) {
-			var schedule_create_new = $('.schedule_create_new', schedule_empty);
-			var schedule_create_form = $('.schedule_create_form');
+			var schedule_create_new = $('.admin_schedule_create_new', schedule_empty);
+			var schedule_create_form = $('.admin_schedule_create_form');
 			var schedule_dates = $('.datepicker', schedule_empty);
 			schedule_create_new
 				.click(function() {
 					schedule_create_new.fadeOut(200, function() {
-						schedule_create_new.next('.schedule_create_form').fadeIn(200);
+						schedule_create_new.next('.admin_schedule_create_form').fadeIn(200);
 					})
 				});
 			$.datepicker.setDefaults($.datepicker.regional['']);
 			schedule_dates.datepicker($.datepicker.regional['ru']);
-			$('.schedule_create_form_cancel', schedule_empty)
+			$('.admin_schedule_create_form_cancel', schedule_empty)
 				.click(function() {
 					schedule_create_form.fadeOut(200, function() {
-						schedule_create_form.prev('.schedule_create_new').fadeIn(200);
+						schedule_create_form.prev('.admin_schedule_create_new').fadeIn(200);
 					})
 				});
-			$('.schedule_create_form_accept', schedule_create_form)
+			$('.admin_schedule_create_form_accept', schedule_create_form)
 				.click(function() {
 					//нужна проверка значений
-					var date1 = new Date($(".schedule_start_date", schedule_create_form).attr('value').replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
-					var date2 = new Date($(".schedule_end_date", schedule_create_form).attr('value').replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
+					var date1 = new Date($(".admin_schedule_start_date", schedule_create_form).attr('value').replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
+					var date2 = new Date($(".admin_schedule_end_date", schedule_create_form).attr('value').replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
 					Schedule = {
 						startDate : date1,
 						endDate : date2
