@@ -64,7 +64,6 @@
 	top:50%;
 	margin-top:-30px;
 	cursor:pointer;
-	display: none;
 }
 
 .schedule_nav_left {
@@ -101,13 +100,17 @@
 	-moz-box-sizing:border-box;
 	box-sizing:border-box;
 	float:left;
-	border: 0px dotted #777;
+	border:0px dotted #777;
 	border-width: 1px 0 0 1px;
 	position:relative;
 }
 
 .schedule_day_weekend {
 	background:rgba(255,0,0,0.16);
+}
+
+.schedule_day_skip {
+	border-color:#aaa;
 }
 
 .schedule_day_current {
@@ -117,8 +120,10 @@
 .schedule_day_header {
 	border:0px solid red;
 	font-size:16px;
+	color:#333;
 	height:20px;
 	width:100%;
+	text-align: left;
 	padding:0px 0;
 	position:absolute;
 	top:-20px;
@@ -127,6 +132,10 @@
 
 .schedule_day_weekend .schedule_day_header {
 	color:#f00;
+}
+
+.schedule_day_skip .schedule_day_header {
+	color:#aaa;
 }
 
 .schedule_day_current .schedule_day_header {
