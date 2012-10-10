@@ -1,0 +1,58 @@
+.b-admin {
+}
+
+.b-admin_new_schedule {
+}
+
+.b-admin__create-new {
+	font-size: 140px;
+	color:#415F96;
+	cursor:pointer;	
+}
+
+.b-admin__create-new:hover {
+	color: #ccc;
+}
+
+.b-admin__edit-form {
+	margin-top:40px;
+	border:0px solid red;
+	font-size:20px;
+	display: none;
+}
+
+.b-admin__form-controls {
+	margin-top:40px;
+	font-size:16px;
+}
+
+.b-admin__form-control {
+	margin:0 10px;
+	color:#ccc;
+	border-bottom: 1px dotted #ccc;
+	text-decoration:none;
+}
+
+.b-admin__form-control:hover {
+	color:#f00;
+	border-bottom: 1px dotted #f00;
+}
+
+.b-admin__schedule_add_event {
+	border:1px solid #333;
+	border-radius: 50%;
+	height:12px;
+	width:12px;
+	font-size:13px;
+	color:#333;
+	text-align:center;
+	cursor:pointer;
+	position:absolute;
+	top:2px;
+	left:25px;
+}
+
+.b-admin__schedule_add_event:hover {
+	color:#f00;
+	border-color: #f00;
+}

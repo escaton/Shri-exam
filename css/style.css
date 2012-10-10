@@ -1,6 +1,8 @@
-@import url(common.css);
+@import url(page.css);
 @import url(schedule.css);
-@import url(admin_schedule.css);
+@import url(admin.css);
+@import url(nav.css);
+@import url(day.css);
+@import url(event.css);
+@import url(event-info.css);
 @import url(ui-lightness/jquery-ui-1.8.24.custom.css);
-
-

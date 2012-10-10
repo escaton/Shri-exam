@@ -11,35 +11,35 @@
 		<script src="scripts/jquery.ui.datepicker-ru.js"></script>
 		<script src="scripts/index.js"></script>
 	</head>
-	<body>
-		<div class="header">
-		</div>
-		<div class="schedule_container">
-			<div class="schedule_empty">
-				<span class="schedule_empty_message">Расписания еще нет</span>
-				<span class="admin_schedule_create_new">+</span>
-				<div class="admin_schedule_create_form">
-					<input class="admin_schedule_start_date datepicker" type="text" />
-					 — 
-					 <input class="admin_schedule_end_date datepicker" type="text" />
-					<div class="admin_schedule_create_form_controls">
-						<a href="#" class="admin_schedule_create_form_accept">Создать</a>
-						<a href="#" class="admin_schedule_create_form_cancel">Отмена</a>
-					</div>
-				</div>				
+	<body class="b-page">
+		<div class="b-schedule">
+			<div class="b-schedule__layout b-schedule__layout_empty">
+				<span class="b-schedule__message">Расписания еще нет</span>
+				<div class="b-admin b-admin_new_schedule">
+					<span class="b-admin__create-new">+</span>
+					<div class="b-admin__edit-form">
+						<input class="b-admin__date-input b-admin__date-input_start" type="text" />
+						 — 
+						<input class="b-admin__date-input b-admin__date-input_end" type="text" />
+						<div class="b-admin__form-controls">
+							<a href="#" class="b-admin__form-control b-admin__form-control_create">Создать</a>
+							<a href="#" class="b-admin__form-control b-admin__form-control_cancel">Отмена</a>
+						</div>
+					</div>		
+				</div>		
 			</div>
-			<div class="schedule">
-				<div class="schedule_nav schedule_nav_left">
+			<div class="b-schedule__layout b-schedule__layout_exist">
+				<div class="b-nav">
+					<div class="b-nav__nav-unit b-nav__nav-unit_left"></div>
+					<div class="b-nav__nav-unit b-nav__nav-unit_right"></div>
 				</div>
-				<div class="schedule_nav schedule_nav_right">
-				</div>
-				<div class="schedule_body">
-					<div class="schedule_day_container">
+				<div class="b-schedule__body">
+					<div class="b-schedule__day-container">
+						<div class="b-event-info">
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="footer">
 		</div>
 	</body>
 </html>
