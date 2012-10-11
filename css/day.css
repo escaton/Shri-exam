@@ -39,9 +39,15 @@
 }
 
 .b-day_skip .b-day__header {
-	color:#aaa;
+	color:#999;
 }
 
 .b-day_current .b-day__header {
 	color:#00f;
+}
+
+.b-day__header-date {
+	margin:5px;
+	font-size:80%;
+	color:#999;
 }
