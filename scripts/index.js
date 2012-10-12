@@ -2,16 +2,20 @@ $('HTML').addClass('JS');
 $(function() {
 	var layout_empty = $('.b-schedule__layout_empty');
 	var layout_exist = $('.b-schedule__layout_exist');
+	var admin_check = $('.b-header__admin-toggle')
+		.change(function() {
+			//alert(admin_check.prop('checked'))
+		});
 	if ('localStorage' in window && window['localStorage'] !== null) {
 		var store = window.localStorage;
-		var Schedule = {};
+		 Schedule = {};
 		var Admin = {};
 		if (store['Schedule']) {
 			layout_empty.hide(0);
 			Schedule_init();
-			if (true) admin_init('exist');	
+			if (admin_check.prop('checked')) admin_init('exist');	
 		} else {
-			if (true) admin_init('empty');
+			if (admin_check.prop('checked')) admin_init('empty');
 		}
 	} else {
 		$('.b-schedule__message', layout_empty).text("Браузер не поддерживает localStorage");
@@ -20,7 +24,7 @@ $(function() {
 		Date.prototype.getRuDay = function () {
 			return (this.getDay() + 6) % 7;
 		}
-		Schedule.fromStorage = JSON.parse(store['Schedule']);
+		StoreLoad();
 		Schedule.Data = {
 			DaysOfWeek : ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"],
 			DaysOfWeekFull : ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"],
@@ -33,30 +37,85 @@ $(function() {
 			firstDate : null,
 			duration : 0,
 			weeks : 0,
-			daysToCurrent : null,
-			weeksToCurrent : null,
+			daysToCurrent : 0,
+			weeksToCurrent : 0,
 			currentWeek : 0,
-			body_width : null,
-			day_width : null,
+			schedule_days : $(),
+			body_width : 0,
+			day_width : 0,
 			day_container : $('.b-schedule__day-container', layout_exist),
+			day_container_offsetLeft : 0,
 			event_info : {
+				elems : {
+					startTime : {
+						elem : $('.b-event-info__startTime', layout_exist),
+						defaultval : "ЧЧ:ММ"
+					},
+					endTime : {
+						elem : $('.b-event-info__endTime', layout_exist),
+						defaultval : "ЧЧ:ММ"
+					},
+					reporter : {
+						elem : $('.b-event-info__item_reporter', layout_exist),
+						defaultval : "Докладчик"
+					},
+					title : {
+						elem : $('.b-event-info__item_title', layout_exist),
+						defaultval : "Тема доклада"
+					},
+					description : {
+						elem : $('.b-event-info__item_description', layout_exist),
+						defaultval : "Описание"
+					},
+					yaru : {
+						elem : $('.b-event-info__link_yaru', layout_exist),
+						defaultval : "http://clubs.ya.ru/"
+					},
+					presentation : {
+						elem : $('.b-event-info__link_presentation', layout_exist),
+						defaultval : "http://yadi.sk/"
+					},
+					video : {
+						elem : $('.b-event-info__link_video', layout_exist),
+						defaultval : "http://static.video.yandex.ru/"
+					},
+					video_download : {
+						elem : $('.b-event-info__link_video-download', layout_exist), 
+						defaultval : "http://yadi.sk/"
+					}
+				},
 				elem : $('.b-event-info', layout_exist),
-				width : null,
-				day : -1,
+				width : 0,
 				date : null,
+				day : null,
+				pos : -1,
+				event : null,
+				event_index : 0,
 				pannel : $('.b-event-info__pannel', layout_exist),
+				close_btn : $('.b-event-info__close', layout_exist),
+				extra_callback : undefined,
 				open : function(callback) {
-					if (this.day%7>4) {
-						Schedule.Data.day_container.animate({'left':'-='+(this.day%7-4)*Schedule.Data.day_width}, 400);
-					};
+					this.container_resize('-');
 					this.elem.animate({'width':this.width}, 400, callback);
 				},
 				close : function(callback) {
+					this.container_resize('+');
+					this.pos = -1;
+					if (this.extra_callback != undefined) {
+						this.elem.animate({'width':0}, 400, function() {
+							if (callback != undefined) callback();
+							Schedule.Data.event_info.extra_callback();
+						})
+					} else {
+						this.elem.animate({'width':0}, 400, callback);
+					}
+				},
+				container_resize : function(dir) {
 					if (this.day%7>4) {
-						Schedule.Data.day_container.animate({'left':'+='+(this.day%7-4)*Schedule.Data.day_width}, 400);
+						Schedule.Data.day_container.animate({'left':dir+'='+(this.day%7-4)*Schedule.Data.day_width}, 400, function() {
+							Schedule.Data.day_container_offsetLeft = Schedule.Data.day_container.offset().left;
+						});
 					};
-					this.day = -1;
-					this.elem.animate({'width':0}, 400, callback);
 				}
 			},
 			progress : $('.b-progress', layout_exist)
@@ -76,20 +135,43 @@ $(function() {
 		Schedule.Data.day_width = Schedule.Data.body_width/7;
 		Schedule.Data.event_info.width = Schedule.Data.day_width*2-1;
 		Schedule.Data.event_info.pannel.width(Schedule.Data.event_info.width);
-		Schedule.Data.event_info.elem.children('.b-event-info__pannel')
 		Schedule.Data.day_container.width(Schedule.Data.body_width*Schedule.Data.weeks + Schedule.Data.event_info.width);
 		layout_exist.css({'visibility':'visible','display':'none'});
-
+/*
+		Schedule.Data.event_info.open = function(callback) {
+			this.container_resize('-');
+			this.elem.animate({'width':this.width}, 400, callback);
+		};
+		Schedule.Data.event_info.open = function(callback) {
+			this.container_resize('+');
+			this.pos = -1;
+			alert('123');
+			if (this.extra_callback != undefined) {
+				this.elem.animate({'width':0}, 400, function() {
+					if (callback != undefined) callback();
+					Schedule.Data.event_info.extra_callback();
+				})
+			} else {
+				this.elem.animate({'width':0}, 400, callback);
+			}
+		};
+		Schedule.Data.event_info.container_resize = function(dir) {
+			if (this.day%7>4) {
+				Schedule.Data.day_container.animate({'left':dir+'='+(this.day%7-4)*Schedule.Data.day_width}, 400, function() {
+					Schedule.Data.day_container_offsetLeft = Schedule.Data.day_container.offset().left;
+				});
+			};
+		};
+*/
 		for (var week=0; week<Schedule.Data.weeks; week++) {
 			for (var dayInWeek=0; dayInWeek<7; dayInWeek++) {
 				var date = GetShiftedDate(Schedule.Data.firstDate, dayInWeek+week*7);
-				BuildDay(date,week,dayInWeek,'new')
-					.appendTo(Schedule.Data.day_container);
+				BuildDay(date,week,dayInWeek).appendTo(Schedule.Data.day_container);
 			}
 			BuildProgressWeek(week)
 				.appendTo(Schedule.Data.progress);
 		};
-
+		Schedule.Data.schedule_days = $('.b-day', Schedule.Data.day_container);
 		$('.b-nav__nav-unit')
 			.click(function() {
 				if (!Schedule.Data.day_container.is(':animated')) {
@@ -113,41 +195,66 @@ $(function() {
 				}
 				return false;
 			});
-		$('.b-event-info__close', Schedule.Data.event_info.elem)
+		Schedule.Data.event_info.close_btn
 			.click(function() {
 				Schedule.Data.event_info.close();
 			});
 		if ((new Date() > Schedule.Data.startDate) && (new Date() < Schedule.Data.endDate)) {
 			Day_container_move(Schedule.Data.weeksToCurrent, true);
 		}
-		layout_exist.fadeIn(200);
+		layout_exist.fadeIn(500);
+		Schedule.Data.day_container_offsetLeft = Schedule.Data.day_container.offset().left;
 	};
 	function admin_init(stage) {
-		$('.b-admin').show(0);
+		if (!Admin.controls) {
+			Admin.controls = {
+				new_schedule : {
+					create_new : $('<span class="b-admin__create-new">+</span>'),
+					edit_form : $('<div class="b-admin__edit-form">\
+						<input class="b-admin__date-input b-admin__date-input_start" type="text" /> — \
+						<input class="b-admin__date-input b-admin__date-input_end" type="text" />\
+						<div class="b-admin__form-controls">\
+						<a href="#" class="b-admin__form-control b-admin__form-control_create">Создать</a>\
+						<a href="#" class="b-admin__form-control b-admin__form-control_cancel">Отмена</a>\
+						</div></div>'
+						)
+				},
+				add_event : {
+					elem : $('<div class="b-admin">\
+						<div class="b-admin__schedule_add_event">+</div>'),
+					day : -1
+				},
+				edit_event : $('<div class="b-admin b-admin__edit-event">\
+					<div class="b-admin__form-controls">\
+					<a class="b-admin__form-control b-admin__form-control_save">Сохранить</a>\
+					<a class="b-admin__form-control b-admin__form-control_create">Создать</a>\
+					<a class="b-admin__form-control b-admin__form-control_delete">Удалить</a>\
+					</div></div>'
+					)
+			}
+		}
 		if (stage == 'empty') {
-			Admin.schedule = {
-				create_new : $('.b-admin__create-new', layout_empty),
-				edit_form : $('.b-admin__edit-form', layout_empty),
-				date_input : $('.b-admin__date-input', layout_empty)
-			};
-			Admin.schedule.create_new
+			Admin.controls.new_schedule.create_new
 				.click(function() {
-					Admin.schedule.create_new.fadeOut(200, function() {
-						Admin.schedule.edit_form.fadeIn(200);
+					Admin.controls.new_schedule.create_new.fadeOut(200, function() {
+						Admin.controls.new_schedule.edit_form
+							.fadeIn(200);
 					})
 				});
 			$.datepicker.setDefaults($.datepicker.regional['']);
-			Admin.schedule.date_input.datepicker($.datepicker.regional['ru']);
-			$('.b-admin__form-control_cancel', Admin.schedule.edit_form)
+			Admin.controls.new_schedule.edit_form
+				.find('.b-admin__date-input')
+				.datepicker($.datepicker.regional['ru']);
+			$('.b-admin__form-control_cancel', Admin.controls.new_schedule.edit_form)
 				.click(function() {
-					Admin.schedule.edit_form.fadeOut(200, function() {
-						Admin.schedule.edit_form.prev('.b-admin__create-new').fadeIn(200);
+					Admin.controls.new_schedule.edit_form.fadeOut(200, function() {
+						Admin.controls.new_schedule.create_new.fadeIn(200);
 					})
 				});
-			$('.b-admin__form-control_create', Admin.schedule.edit_form)
+			$('.b-admin__form-control_create', Admin.controls.new_schedule.edit_form)
 				.click(function() {
-					var date1 = new Date($(".b-admin__date-input_start", Admin.schedule.edit_form).attr('value').replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
-					var date2 = new Date($(".b-admin__date-input_end", Admin.schedule.edit_form).attr('value').replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
+					var date1 = new Date($(".b-admin__date-input_start", Admin.controls.new_schedule.edit_form).val().replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
+					var date2 = new Date($(".b-admin__date-input_end", Admin.controls.new_schedule.edit_form).val().replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
 					if (date2<date1) {
 						alert("Что-то не так с датами");
 						return false;
@@ -157,149 +264,162 @@ $(function() {
 						endDate : date2,
 						days : {}
 					};
-					store['Schedule'] = JSON.stringify(Schedule.fromStorage);
+					StoreSave();
 					layout_empty.fadeOut(200, function() {
 						Schedule_init();
 						admin_init('exist')
 					});
 					return false;
-				});	
+				});
+			layout_empty
+				.append(
+					$('<div class="b-admin b-admin_new-schedule"></div>')
+						.append(Admin.controls.new_schedule.create_new,Admin.controls.new_schedule.edit_form)
+				);
 		} else {
-			Admin.event_info = {
-				startTime : {
-					elem : $('.b-event-info__startTime', layout_exist),
-					defaultval : "12:00"
-				},
-				endTime : {
-					elem : $('.b-event-info__endTime', layout_exist),
-					defaultval : "13:00"
-				},
-				reporter : {
-					elem : $('.b-event-info__item_reporter', layout_exist),
-					defaultval : "Докладчик"
-				},
-				title : {
-					elem : $('.b-event-info__item_title', layout_exist),
-					defaultval : "Тема доклада"
-				},
-				description : {
-					elem : $('.b-event-info__item_description', layout_exist),
-					defaultval : "Описание"
-				},
-				yaru : {
-					elem : $('.b-event-info__link_yaru', layout_exist),
-					defaultval : "http://clubs.ya.ru/"
-				},
-				presentation : {
-					elem : $('.b-event-info__link_presentation', layout_exist),
-					defaultval : "http://yadi.sk/"
-				},
-				video : {
-					elem : $('.b-event-info__link_video', layout_exist),
-					defaultval : "http://static.video.yandex.ru/"
-				},
-				video_download : {
-					elem : $('.b-event-info__link_video-download', layout_exist), 
-					defaultval : "http://yadi.sk/"
-				}, 
-			}
-			$.each(Admin.event_info, function(index, item) {
+			Admin.controls.add_event.elem
+				.click(function() {
+					Admin.controls.edit_event.addClass('b-admin__edit-event_create');
+					Schedule.Data.event_info.extra_callback = function() {
+						Admin.controls.edit_event.removeClass('b-admin__edit-event_create');
+						Schedule.Data.event_info.extra_callback = undefined;
+					};
+					Show_event_details($(this).parents('.b-day'));
+				});
+			Admin.controls.edit_event
+				.find('.b-admin__form-control_create')
+				.click(function() {
+					//нужна проверка значений
+					var event_day = Schedule.Data.event_info.day;
+					var new_event = {
+						date : event_day.data('date').getTime(),
+						startTime : Schedule.Data.event_info.elems.startTime.elem.text(),
+						endTime : Schedule.Data.event_info.elems.endTime.elem.text(),
+						reporter : Schedule.Data.event_info.elems.reporter.elem.text(),
+						title : Schedule.Data.event_info.elems.title.elem.text(),
+						description : Schedule.Data.event_info.elems.description.elem.text(),
+						yaru : Schedule.Data.event_info.elems.yaru.elem.text(),
+						presentation : Schedule.Data.event_info.elems.presentation.elem.text(),
+						video : Schedule.Data.event_info.elems.video.elem.text(),
+						video_download : Schedule.Data.event_info.elems.video_download.elem.text()
+					};
+					if (!Schedule.fromStorage.days[new_event.date])
+						Schedule.fromStorage.days[new_event.date] = [];
+					var events = Schedule.fromStorage.days[new_event.date];
+					events.push(new_event);
+					BuildEvents(event_day.find('.b-event').remove().end(), events);
+					StoreSave();
+					Schedule.Data.event_info.close();
+					return false;
+				});
+			Admin.controls.edit_event
+				.find('.b-admin__form-control_save')
+				.click(function() {
+					//нужна проверка значений
+					var event_day = Schedule.Data.event_info.day;
+					var new_event = {
+						date : event_day.data('date').getTime(),
+						startTime : Schedule.Data.event_info.elems.startTime.elem.text(),
+						endTime : Schedule.Data.event_info.elems.endTime.elem.text(),
+						reporter : Schedule.Data.event_info.elems.reporter.elem.text(),
+						title : Schedule.Data.event_info.elems.title.elem.text(),
+						description : Schedule.Data.event_info.elems.description.elem.text(),
+						yaru : Schedule.Data.event_info.elems.yaru.elem.text(),
+						presentation : Schedule.Data.event_info.elems.presentation.elem.text(),
+						video : Schedule.Data.event_info.elems.video.elem.text(),
+						video_download : Schedule.Data.event_info.elems.video_download.elem.text()
+					};
+					var events = Schedule.fromStorage.days[new_event.date];
+					events[Schedule.Data.event_info.event_index] = new_event;
+					BuildEvents(event_day.find('.b-event').remove().end(), events);
+					StoreSave();
+					Schedule.Data.event_info.close();
+					return false;
+				});
+			Admin.controls.edit_event
+				.find('.b-admin__form-control_delete')
+				.click(function() {
+					if(confirm("Вы действительно хотите удалить это событие?")) {
+						var event_day = Schedule.Data.event_info.day;
+						var events = Schedule.fromStorage.days[event_day.data('date').getTime()];
+						events.splice(Schedule.Data.event_info.event_index,1);
+						if (events.length == 0)
+							delete(Schedule.fromStorage.days[event_day.data('date').getTime()]);
+						BuildEvents(event_day.find('.b-event').remove().end(), events);
+						StoreSave();
+						Schedule.Data.event_info.close();
+						return false;
+					}
+				});
+			$.each(Schedule.Data.event_info.elems, function(index, item) {
 				item.elem
 					.attr('contenteditable','true')
 					.toggleClass('b-event-info__item_editable')
 					.text(item.defaultval);
 			});
-			$('.b-admin__form-control_save', Schedule.Data.event_info.pannel)
-				.click(function() {
-					//нужна проверка значений
-					var event_day = $('.b-day', Schedule.Data.day_container).eq(Schedule.Data.event_info.day);
-					var new_event = {
-						day : event_day,
-						date : event_day.data('date').getTime(),
-						startTime : Admin.event_info.startTime.elem.text(),
-						endTime : Admin.event_info.endTime.elem.text(),
-						reporter : Admin.event_info.reporter.elem.text(),
-						title : Admin.event_info.title.elem.text(),
-						description : Admin.event_info.description.elem.text(),
-						yaru : Admin.event_info.yaru.elem.text(),
-						presentation : Admin.event_info.presentation.elem.text(),
-						video : Admin.event_info.video.elem.text(),
-						video_download : Admin.event_info.video_download.elem.text()
-					};
-					if (!Schedule.fromStorage.days[new_event.date]) Schedule.fromStorage.days[new_event.date] = [];
-					var events = Schedule.fromStorage.days[new_event.date];
-					events.push(new_event);
-					BuildEvents(event_day.find('.b-event').remove().end(), events);
-					store['Schedule'] = JSON.stringify(Schedule.fromStorage);
-					Schedule.Data.event_info.close();
-					return false;
-				});
-			$('.b-admin__delete-event', layout_exist)
-				.click(function() {
-					if(confirm("Вы действительно хотите удалить это событие?")) {
-						var day_event = $(this).parents('.b-event');
-						var day = day_event.data('day');
-						day_event.slideUp(200, function() {
-							var events = Schedule.fromStorage.days[day_event.data('date')]
-							events.splice(day_event.data('index'),1);
-							day.find('.b-event').remove();
-							BuildDay(day,events);
-							if (events.length == 0) delete(events);
-							store['Schedule'] = JSON.stringify(Schedule.fromStorage);
-						});
+			Schedule.Data.event_info.elem.append(Admin.controls.edit_event);
+			Schedule.Data.day_container
+				.mousemove(function(e) {
+					var i = (e.pageX - Schedule.Data.day_container_offsetLeft);
+					var index = Math.floor(i/Schedule.Data.day_width);
+					if (Schedule.Data.event_info.pos > -1) {
+						if (index > Schedule.Data.event_info.pos)
+							index = Admin.controls.add_event.day;
+						if (i > Schedule.Data.event_info.pos*Schedule.Data.day_width + Schedule.Data.event_info.width)
+							index = Math.floor((i-Schedule.Data.event_info.width)/Schedule.Data.day_width);
 					}
-				});
+					if (index != Admin.controls.add_event.day) {
+						Admin.controls.add_event.day = index;
+						var day = Schedule.Data.day_container
+							.find('.b-day')
+							.eq(index);
+						if (!day.hasClass('b-day_skip')) {
+							Admin.controls.add_event.elem
+								.appendTo(day);
+						}
+					}
+				})
+				.mouseleave(function() {
+					Admin.controls.add_event.elem.hide(0);
+				})
+				.mouseenter(function() {
+					Admin.controls.add_event.elem.show(0);
+				})
+
 		}
 	};
 	function BuildDay(date, week, dayInWeek) {
-		var day = $('<div>')
-			.addClass('b-day')
-			.data('date', date);
-		var day_header = $('<div>')
-			.addClass('b-day__header')
-			.text(Schedule.Data.DaysOfWeek[dayInWeek])
-			.append($('<span>')
-				.addClass('b-day__header-date')
-				.text(date.getDate()+" "+Schedule.Data.Months[date.getMonth()])
-			)
-			.appendTo(day);
-		if (dayInWeek > 4) day.addClass('b-day_weekend');
-		if (week == Schedule.Data.weeksToCurrent && dayInWeek == Schedule.Data.daysToCurrent) day.addClass('b-day_current');
+		var classes = '';
+		if (dayInWeek > 4) classes+=' b-day_weekend';
+		if (week == Schedule.Data.weeksToCurrent && dayInWeek == Schedule.Data.daysToCurrent) classes+=' b-day_current';
 		if ((week == 0 && dayInWeek < Schedule.Data.startDateDay) || (week == Schedule.Data.weeks-1 && dayInWeek > Schedule.Data.endDateDay)) {
-			day.addClass('b-day_skip');
-		} else {
-			var add_control = $('<div>')
-				.addClass('b-admin')
-				.appendTo(day_header)
-				.append($('<div>')
-					.text("+")
-					.addClass('b-admin__schedule_add_event')
-					.click(function() {
-						Show_event_details($(this).parents('.b-day'),'new');
-					})
-				);
+			classes+=' b-day_skip';
 		}
+		var day = '<div class="b-day'+classes+'" style="width:'+Schedule.Data.day_width+'px">\
+			<div class="b-day__header">'+Schedule.Data.DaysOfWeek[dayInWeek]+'\
+			<span class="b-day__header-date">'+date.getDate()+' '+Schedule.Data.Months[date.getMonth()]+'\
+			</span></div></div>';
+		day = $(day);
 		var events = Schedule.fromStorage.days[date.getTime()];
 		if (events) {
 			BuildEvents(day,events);
 		}
-		return day;
+		return day.data('date', date);
 	};
 	function BuildEvents(day,events) {
 		$.each(events, function (index, elem) {
-			elem[day] = day;
-			elem[index] = index;
-			var day_event = $('<div>')
-				.addClass('b-event')
-				.append('<div class="b-event__time">\
-					'+elem.startTime+' — '+elem.endTime+'</div>\
-					<div class="b-event__title">\
-					'+elem.title+'</div>\
-					<div class="b-admin">\
-					<div class="b-admin__delete-event b-event-info__close">×</div></div>'
+			var day_event = $('<div class="b-event">\
+				<div class="b-event__time">\
+				'+elem.startTime+' — '+elem.endTime+'</div>\
+				<div class="b-event__title">\
+				'+elem.title+'</div>'
 				)
 				.data(elem)
 				.appendTo(day);
+			day_event
+				.click(function() {
+					Show_event_details(day,elem,index);
+				})
 		});
 	};
 	function BuildProgressWeek(week) {
@@ -318,10 +438,7 @@ $(function() {
 			progressWeek.addClass('b-progress__week_current');
 		}
 		return progressWeek;
-	}
-	function DeleteEvent() {
-
-	}
+	};
 	function GetShiftedDate(start, diff) {
 		return new Date(start.getTime()+diff*(1000*60*60*24));
 	};
@@ -332,21 +449,31 @@ $(function() {
 		if (Schedule.Data.event_info.day > -1) {
 			Schedule.Data.event_info.close();
 		}
-		Schedule.Data.day_container.animate({'left':(-1)*Schedule.Data.body_width*week+'px'}, duration);
+		Schedule.Data.day_container.animate({'left':(-1)*Schedule.Data.body_width*week+'px'}, duration, function() {
+			Schedule.Data.day_container_offsetLeft = Schedule.Data.day_container.offset().left;
+		});
 	};
-	function Show_event_details(elem, act) {
-		var pos = $('.b-day', Schedule.Data.day_container).index(elem);
-		if (pos == Schedule.Data.event_info.day) return 0;
-		Schedule.Data.event_info.date = elem.data('date');
+	function Show_event_details(day, event, index) {
+		var pos = Schedule.Data.schedule_days.index(day);
+		if (((pos == Schedule.Data.event_info.pos && !event) || (event == Schedule.Data.event_info.event && event)) && Schedule.Data.event_info.pos>-1) {
+			return Schedule.Data.event_info.close();
+		}
+		Schedule.Data.event_info.date = day.data('date');
 		var open = function() {
 			$('.b-event-info__item_date', Schedule.Data.event_info.elem)
 				.text(Schedule.Data.event_info.date.getDate()+" "+Schedule.Data.MonthsFull[Schedule.Data.event_info.date.getMonth()]);
-			Schedule.Data.event_info.day = pos;
+			Schedule.Data.event_info.pos = pos;
+			Schedule.Data.event_info.day = day;
+			Schedule.Data.event_info.event = event;
+			Schedule.Data.event_info.event_index = index;
 			Schedule.Data.event_info.elem
-				.insertAfter(elem)
+				.insertAfter(day);
+			$.each(Schedule.Data.event_info.elems, function(index, item) {
+				event ? item.elem.text(event[index]) : item.elem.text(item.defaultval);
+			})
 			Schedule.Data.event_info.open();
 		};
-		if (Schedule.Data.event_info.day > -1) {
+		if (Schedule.Data.event_info.pos > -1) {
 			Schedule.Data.event_info.close(function() {
 				open();
 			});
@@ -354,4 +481,10 @@ $(function() {
 			open();
 		}
 	};
+	function StoreLoad() {
+		Schedule.fromStorage = JSON.parse(store['Schedule']);
+	};
+	function StoreSave() {
+		store['Schedule'] = JSON.stringify(Schedule.fromStorage);
+	}
 });

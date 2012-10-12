@@ -54,13 +54,12 @@
 	box-sizing:border-box;
 	display: block;
 	margin:0px 0 10px 0;
-	font-size: 16px;	
-	overflow:hidden;
+	font-size: 16px;
 	text-overflow:ellipsis;
 }
 
 .b-event-info__item_editable {
-	border:1px dashed #999;
+	outline:1px dashed #999;
 }
 
 .b-event-info__item_date {

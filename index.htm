@@ -12,21 +12,15 @@
 		<script src="scripts/index.js"></script>
 	</head>
 	<body class="b-page">
+		<div class="b-header">
+			<div class="b-header__admin-switch">
+			Режим администрирования:
+			<input type="checkbox" class="b-header__admin-toggle" checked>
+			</div>
+		</div>
 		<div class="b-schedule">
 			<div class="b-schedule__layout b-schedule__layout_empty">
 				<span class="b-schedule__message">Расписания еще нет</span>
-				<div class="b-admin b-admin_new-schedule">
-					<span class="b-admin__create-new">+</span>
-					<div class="b-admin__edit-form">
-						<input class="b-admin__date-input b-admin__date-input_start" type="text" />
-						 — 
-						<input class="b-admin__date-input b-admin__date-input_end" type="text" />
-						<div class="b-admin__form-controls">
-							<a href="#" class="b-admin__form-control b-admin__form-control_create">Создать</a>
-							<a href="#" class="b-admin__form-control b-admin__form-control_cancel">Отмена</a>
-						</div>
-					</div>		
-				</div>		
 			</div>
 			<div class="b-schedule__layout b-schedule__layout_exist">
 				<div class="b-nav">
@@ -39,40 +33,35 @@
 							<div class="b-event-info__close">×</div>
 							<div class="b-event-info__pannel">
 								<div class="b-event-info__header">
-									<span class="b-event-info__item b-event-info__item_date">12 октября</span>
+									<span class="b-event-info__item b-event-info__item_date"></span>
 									<span class="b-event-info__item b-event-info__item_time">
-										<span class="b-event-info__startTime">ЧЧ:ММ</span>
+										<span class="b-event-info__startTime"></span>
 										 — 
-										<span class="b-event-info__endTime">ЧЧ:ММ</span>
+										<span class="b-event-info__endTime"></span>
 									</span>
 								</div>
 								<div class="b-event-info__body">
-									<span class="b-event-info__item b-event-info__item_reporter">Докладчик</span>
-									<span class="b-event-info__item b-event-info__item_title">Тема доклада</span>
-									<p class="b-event-info__item b-event-info__item_description">Описание доклада</p>
+									<span class="b-event-info__item b-event-info__item_reporter"></span>
+									<span class="b-event-info__item b-event-info__item_title"></span>
+									<p class="b-event-info__item b-event-info__item_description"></p>
 								</div>
 								<div class="b-event-info__footer">
 									<span class="b-event-info__item b-event-info__item_link">
 										Обсуджение на Я.ру:
-										<a href="http://clubs.ya.ru/4611686018427468886/replies.xml?item_no=116" class="b-event-info__link b-event-info__link_yaru">ya.ru</a>
+										<a href="" class="b-event-info__link b-event-info__link_yaru"></a>
 									</span>
 									<span class="b-event-info__item b-event-info__item_link">
 										Презентация:
-										<a href="http://yadi.sk/d/3N0d6h9rlRA8" class="b-event-info__link b-event-info__link_presentation">http://yadi.sk/d/3N0d6h9rlRA8</a>
+										<a href="" class="b-event-info__link b-event-info__link_presentation"></a>
 									</span>
 									<span class="b-event-info__item b-event-info__item_link">
 										Видео:
-										<a href="http://static.video.yandex.ru/lite/ya-events/qxv95xwi4q.4820" class="b-event-info__link b-event-info__link_video">video.yandex.ru</a>
+										<a href="" class="b-event-info__link b-event-info__link_video"></a>
 									</span>
 									<span class="b-event-info__item b-event-info__item_link">
 										Видео для скачивания:
-										<a href="http://yadi.sk/d/O5OBYxHwnGTw" class="b-event-info__link b-event-info__link_video-download">http://yadi.sk/d/O5OBYxHwnGTw</a>
+										<a href="" class="b-event-info__link b-event-info__link_video-download"></a>
 									</span>
-								</div>
-								<div class="b-admin b-admin_new-event">
-									<div class="b-admin__form-controls">
-										<a href="#" class="b-admin__form-control b-admin__form-control_save">Сохранить</a>
-									</div>
 								</div>
 							</div>
 						</div>
