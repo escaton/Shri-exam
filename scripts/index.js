@@ -5,22 +5,23 @@ $(function() {
 	var admin_check = $('.b-header__admin-toggle')
 		.change(function() {
 			if (admin_check.prop('checked')) {
-
+				Admin_init(state);
 			} else {
-
+				Admin_unset();
 			}
 		});
 	if ('localStorage' in window && window['localStorage'] !== null) {
 		var store = window.localStorage;
 		 Schedule = {};
 		var Admin = {};
+		var state;
 		if (store.getItem('Schedule')) {
 			layout_empty.hide(0);
-			Schedule_init();
-			if (admin_check.prop('checked')) admin_init('exist');	
+			Schedule_init();	
 		} else {
-			if (admin_check.prop('checked')) admin_init('empty');
+			state = 'empty'
 		}
+		if (admin_check.prop('checked')) Admin_init(state);
 	} else {
 		$('.b-schedule__message', layout_empty).text("Браузер не поддерживает localStorage");
 	}
@@ -28,6 +29,7 @@ $(function() {
 		Date.prototype.getRuDay = function () {
 			return (this.getDay() + 6) % 7;
 		}
+		state = 'exist';
 		StoreLoad();
 		Schedule.Data = {
 			DaysOfWeek : ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"],
@@ -115,8 +117,8 @@ $(function() {
 					}
 				},
 				container_resize : function(dir) {
-					if (this.day%7>4) {
-						Schedule.Data.day_container.animate({'left':dir+'='+(this.day%7-4)*Schedule.Data.day_width}, 400, function() {
+					if (this.pos%7>4) {
+						Schedule.Data.day_container.animate({'left':dir+'='+(this.pos%7-4)*Schedule.Data.day_width}, 400, function() {
 							Schedule.Data.day_container_offsetLeft = Schedule.Data.day_container.offset().left;
 						});
 					};
@@ -184,7 +186,7 @@ $(function() {
 		layout_exist.fadeIn(500);
 		Schedule.Data.day_container_offsetLeft = Schedule.Data.day_container.offset().left;
 	};
-	function admin_init(stage) {
+	function Admin_init(stage) {
 		if (!Admin.controls) {
 			Admin.controls = {
 				new_schedule : {
@@ -246,7 +248,7 @@ $(function() {
 					StoreSave();
 					layout_empty.fadeOut(200, function() {
 						Schedule_init();
-						admin_init('exist')
+						Admin_init('exist')
 					});
 					return false;
 				});
@@ -311,11 +313,11 @@ $(function() {
 						Schedule.fromStorage.days[new_event.date] = [];
 					var events = Schedule.fromStorage.days[new_event.date].slice();
 					events.push(new_event);
-					if (!ValidDay(events)) return false;
+					if (!ValidDay(events,true)) return false;
 				} else {
 					var events = Schedule.fromStorage.days[new_event.date].slice();
 					events[Schedule.Data.event_info.event_index] = new_event;
-					if (!ValidDay(events)) return false;
+					if (!ValidDay(events,true)) return false;
 				}
 				Schedule.fromStorage.days[new_event.date] = events;
 				end_edit_event(event_day, events);
@@ -362,6 +364,9 @@ $(function() {
 
 		}
 	};
+	function Admin_unset() {
+
+	}
 	function BuildDay(date, week, dayInWeek) {
 		var classes = '';
 		if (dayInWeek > 4) classes+=' b-day_weekend';
@@ -429,13 +434,13 @@ $(function() {
 		alert("Что-то не так с временем");
 		return false;
 	};
-	function ValidDay(events) {
+	function ValidDay(events,verbose) {
 		events.sort(function(a,b) {
 			return parseInt(a.startTime.replace(/(\d{2}):(\d{2})/, '$1$2'))-parseInt(b.startTime.replace(/(\d+):(\d+)/, '$1$2'));
 		})
 		for(var i=0; i<events.length-1; i++) {
 			if (parseInt(events[i].endTime.replace(/(\d{2}):(\d{2})/, '$1$2'))>parseInt(events[i+1].startTime.replace(/(\d+):(\d+)/, '$1$2'))) {
-				alert("Это время уже занято");
+				if (verbose) alert("Это время уже занято");
 				return false;
 			}
 		}
