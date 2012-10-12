@@ -453,7 +453,7 @@ $(function() {
 		Schedule.Data.currentWeek = week;
 		var duration;
 		now ? duration = 0 : duration = 400;
-		if (Schedule.Data.event_info.day > -1) {
+		if (Schedule.Data.event_info.pos > -1) {
 			Schedule.Data.event_info.close();
 		}
 		Schedule.Data.day_container.animate({'left':(-1)*Schedule.Data.body_width*week+'px'}, duration, function() {
