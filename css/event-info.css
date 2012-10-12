@@ -12,10 +12,6 @@
 	overflow:hidden;
 }
 
-..b-event-info__admin {
-
-}
-
 .b-event-info__close {
 	border:1px solid #333;
 	border-radius: 50%;
@@ -49,6 +45,11 @@
 	border-bottom: 1px dotted #777;
 }
 
+.b-event-info__footer {
+	margin:10px 20px 0;
+	border-bottom: 1px dotted #777;
+}
+
 .b-event-info__item {
 	-moz-box-sizing:border-box;
 	box-sizing:border-box;
@@ -60,6 +61,7 @@
 
 .b-event-info__item_editable {
 	outline:1px dashed #999;
+	height:20px;
 }
 
 .b-event-info__item_date {
@@ -79,11 +81,7 @@
 
 .b-event-info__item_description {
 	font-size: 13px;
-}
-
-.b-event-info__footer {
-	margin:10px 20px 0;
-	border-bottom: 1px dotted #777;
+	display:block;
 }
 
 .b-event-info__item_link {
@@ -94,4 +92,8 @@
 	height:15px;
 	overflow:hidden;
 	text-overflow:ellipsis;
+}
+
+.b-event-info__item_editable.b-event-info__link {
+	display: block;
 }

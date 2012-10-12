@@ -4,13 +4,17 @@ $(function() {
 	var layout_exist = $('.b-schedule__layout_exist');
 	var admin_check = $('.b-header__admin-toggle')
 		.change(function() {
-			//alert(admin_check.prop('checked'))
+			if (admin_check.prop('checked')) {
+
+			} else {
+
+			}
 		});
 	if ('localStorage' in window && window['localStorage'] !== null) {
 		var store = window.localStorage;
 		 Schedule = {};
 		var Admin = {};
-		if (store['Schedule']) {
+		if (store.getItem('Schedule')) {
 			layout_empty.hide(0);
 			Schedule_init();
 			if (admin_check.prop('checked')) admin_init('exist');	
@@ -137,32 +141,7 @@ $(function() {
 		Schedule.Data.event_info.pannel.width(Schedule.Data.event_info.width);
 		Schedule.Data.day_container.width(Schedule.Data.body_width*Schedule.Data.weeks + Schedule.Data.event_info.width);
 		layout_exist.css({'visibility':'visible','display':'none'});
-/*
-		Schedule.Data.event_info.open = function(callback) {
-			this.container_resize('-');
-			this.elem.animate({'width':this.width}, 400, callback);
-		};
-		Schedule.Data.event_info.open = function(callback) {
-			this.container_resize('+');
-			this.pos = -1;
-			alert('123');
-			if (this.extra_callback != undefined) {
-				this.elem.animate({'width':0}, 400, function() {
-					if (callback != undefined) callback();
-					Schedule.Data.event_info.extra_callback();
-				})
-			} else {
-				this.elem.animate({'width':0}, 400, callback);
-			}
-		};
-		Schedule.Data.event_info.container_resize = function(dir) {
-			if (this.day%7>4) {
-				Schedule.Data.day_container.animate({'left':dir+'='+(this.day%7-4)*Schedule.Data.day_width}, 400, function() {
-					Schedule.Data.day_container_offsetLeft = Schedule.Data.day_container.offset().left;
-				});
-			};
-		};
-*/
+
 		for (var week=0; week<Schedule.Data.weeks; week++) {
 			for (var dayInWeek=0; dayInWeek<7; dayInWeek++) {
 				var date = GetShiftedDate(Schedule.Data.firstDate, dayInWeek+week*7);
@@ -289,51 +268,13 @@ $(function() {
 			Admin.controls.edit_event
 				.find('.b-admin__form-control_create')
 				.click(function() {
-					//нужна проверка значений
-					var event_day = Schedule.Data.event_info.day;
-					var new_event = {
-						date : event_day.data('date').getTime(),
-						startTime : Schedule.Data.event_info.elems.startTime.elem.text(),
-						endTime : Schedule.Data.event_info.elems.endTime.elem.text(),
-						reporter : Schedule.Data.event_info.elems.reporter.elem.text(),
-						title : Schedule.Data.event_info.elems.title.elem.text(),
-						description : Schedule.Data.event_info.elems.description.elem.text(),
-						yaru : Schedule.Data.event_info.elems.yaru.elem.text(),
-						presentation : Schedule.Data.event_info.elems.presentation.elem.text(),
-						video : Schedule.Data.event_info.elems.video.elem.text(),
-						video_download : Schedule.Data.event_info.elems.video_download.elem.text()
-					};
-					if (!Schedule.fromStorage.days[new_event.date])
-						Schedule.fromStorage.days[new_event.date] = [];
-					var events = Schedule.fromStorage.days[new_event.date];
-					events.push(new_event);
-					BuildEvents(event_day.find('.b-event').remove().end(), events);
-					StoreSave();
-					Schedule.Data.event_info.close();
+					create_save_event('create');
 					return false;
 				});
 			Admin.controls.edit_event
 				.find('.b-admin__form-control_save')
 				.click(function() {
-					//нужна проверка значений
-					var event_day = Schedule.Data.event_info.day;
-					var new_event = {
-						date : event_day.data('date').getTime(),
-						startTime : Schedule.Data.event_info.elems.startTime.elem.text(),
-						endTime : Schedule.Data.event_info.elems.endTime.elem.text(),
-						reporter : Schedule.Data.event_info.elems.reporter.elem.text(),
-						title : Schedule.Data.event_info.elems.title.elem.text(),
-						description : Schedule.Data.event_info.elems.description.elem.text(),
-						yaru : Schedule.Data.event_info.elems.yaru.elem.text(),
-						presentation : Schedule.Data.event_info.elems.presentation.elem.text(),
-						video : Schedule.Data.event_info.elems.video.elem.text(),
-						video_download : Schedule.Data.event_info.elems.video_download.elem.text()
-					};
-					var events = Schedule.fromStorage.days[new_event.date];
-					events[Schedule.Data.event_info.event_index] = new_event;
-					BuildEvents(event_day.find('.b-event').remove().end(), events);
-					StoreSave();
-					Schedule.Data.event_info.close();
+					create_save_event('save');
 					return false;
 				});
 			Admin.controls.edit_event
@@ -345,12 +286,45 @@ $(function() {
 						events.splice(Schedule.Data.event_info.event_index,1);
 						if (events.length == 0)
 							delete(Schedule.fromStorage.days[event_day.data('date').getTime()]);
-						BuildEvents(event_day.find('.b-event').remove().end(), events);
-						StoreSave();
-						Schedule.Data.event_info.close();
+						end_edit_event(event_day, events);
 						return false;
 					}
 				});
+			function create_save_event(act) {
+				//нужна проверка значений
+				var event_day = Schedule.Data.event_info.day;
+				var new_event = {
+					date : event_day.data('date').getTime(),
+					startTime : Schedule.Data.event_info.elems.startTime.elem.text(),
+					endTime : Schedule.Data.event_info.elems.endTime.elem.text(),
+					reporter : Schedule.Data.event_info.elems.reporter.elem.text(),
+					title : Schedule.Data.event_info.elems.title.elem.text(),
+					description : Schedule.Data.event_info.elems.description.elem.text(),
+					yaru : Schedule.Data.event_info.elems.yaru.elem.text(),
+					presentation : Schedule.Data.event_info.elems.presentation.elem.text(),
+					video : Schedule.Data.event_info.elems.video.elem.text(),
+					video_download : Schedule.Data.event_info.elems.video_download.elem.text()
+				};
+				if (!ValidEvent(new_event)) return false;
+				if (act == 'create') {
+					if (!Schedule.fromStorage.days[new_event.date])
+						Schedule.fromStorage.days[new_event.date] = [];
+					var events = Schedule.fromStorage.days[new_event.date].slice();
+					events.push(new_event);
+					if (!ValidDay(events)) return false;
+				} else {
+					var events = Schedule.fromStorage.days[new_event.date].slice();
+					events[Schedule.Data.event_info.event_index] = new_event;
+					if (!ValidDay(events)) return false;
+				}
+				Schedule.fromStorage.days[new_event.date] = events;
+				end_edit_event(event_day, events);
+			};
+			function end_edit_event(event_day, events) {
+				BuildEvents(event_day.find('.b-event').remove().end(), events);
+				StoreSave();
+				Schedule.Data.event_info.close();
+			}
 			$.each(Schedule.Data.event_info.elems, function(index, item) {
 				item.elem
 					.attr('contenteditable','true')
@@ -438,6 +412,34 @@ $(function() {
 			progressWeek.addClass('b-progress__week_current');
 		}
 		return progressWeek;
+	};
+	function ValidEvent(event) {
+		if (parseInt(event.startTime.replace(/(\d{2}):(\d{2})/, '$1$2'))<parseInt(event.endTime.replace(/(\d+):(\d+)/, '$1$2'))) {
+			if (event.reporter != '' && event.title != '') {
+				if (event.description == '') delete(event.description);
+				if (event.yaru == '') delete(event.yaru);
+				if (event.presentation == '') delete(event.presentation);
+				if (event.video == '') delete(event.video);
+				if (event.video_download == '') delete(event.video_download);
+				return true;
+			}
+			alert("Не заполнены поля 'докладчик' и/или 'тема доклада'");
+			return false;
+		}
+		alert("Что-то не так с временем");
+		return false;
+	};
+	function ValidDay(events) {
+		events.sort(function(a,b) {
+			return parseInt(a.startTime.replace(/(\d{2}):(\d{2})/, '$1$2'))-parseInt(b.startTime.replace(/(\d+):(\d+)/, '$1$2'));
+		})
+		for(var i=0; i<events.length-1; i++) {
+			if (parseInt(events[i].endTime.replace(/(\d{2}):(\d{2})/, '$1$2'))>parseInt(events[i+1].startTime.replace(/(\d+):(\d+)/, '$1$2'))) {
+				alert("Это время уже занято");
+				return false;
+			}
+		}
+		return true;
 	};
 	function GetShiftedDate(start, diff) {
 		return new Date(start.getTime()+diff*(1000*60*60*24));
