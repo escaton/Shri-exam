@@ -8,7 +8,7 @@
 }
 
 .b-admin_new-event {
-	border:1px solid red;
+	border:1px solid #7c1212;
 	padding:10px 0;
 	width:100%;
 	position: absolute;
@@ -71,7 +71,7 @@
 	cursor:pointer;
 	position:absolute;
 	top:0px;
-	right:5px;
+	right:6px;
 }
 
 .b-admin__schedule_add_event:hover {
