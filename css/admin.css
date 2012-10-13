@@ -1,9 +1,14 @@
 .b-admin {
 	box-sizing:border-box;
 	-moz-box-sizing:border-box;
+	color:#333;
+}
+
+.b-admin_delete-schedule {
 }
 
 .b-admin_new-schedule {
+	color:#ccc;
 }
 
 .b-admin__edit-event {
@@ -45,15 +50,15 @@
 
 .b-admin__form-control {
 	margin:0 10px;
-	color:#ccc;
-	border-bottom: 1px dotted #ccc;
+	color:#333;
+	border-bottom: 1px dotted #333;
 	text-decoration:none;
 	cursor: pointer;
 }
 
-.b-admin__edit-event .b-admin__form-control {
-	color:#333;
-	border-color: #333;
+.b-admin_new-schedule .b-admin__form-control {
+	color: #ccc;
+	border-color: #ccc;
 }
 
 .b-admin__edit-event .b-admin__form-control_create {

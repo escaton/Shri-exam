@@ -2,14 +2,15 @@ $('HTML').addClass('JS');
 $(function() {
 	var layout_empty = $('.b-schedule__layout_empty');
 	var layout_exist = $('.b-schedule__layout_exist');
-	var admin_check = $('.b-header__admin-toggle')
+	var Header = $('.b-header');
+	var admin_check = $('.b-header__admin-toggle', Header)
 		.change(function() {
 			if (admin_check.prop('checked')) {
 				Admin_init(state);
 			} else {
 				Admin_unset(state);
 			}
-		});
+		})
 	if ('localStorage' in window && window['localStorage'] !== null) {
 		var store = window.localStorage;
 		 Schedule = {};
@@ -31,102 +32,105 @@ $(function() {
 		}
 		state = 'exist';
 		StoreLoad();
-		Schedule.Data = {
-			DaysOfWeek : ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"],
-			DaysOfWeekFull : ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"],
-			MonthsFull : ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"],
-			Months : ["янв", "фев", "марта", "апр", "мая", "июня", "июля", "авг", "сент", "окт", "нояб", "дек"],
-			startDate : new Date(Schedule.fromStorage.startDate),
-			endDate : new Date(Schedule.fromStorage.endDate),
-			startDateDay : null,
-			endDateDay : null,
-			firstDate : null,
-			duration : 0,
-			weeks : 0,
-			daysToCurrent : 0,
-			weeksToCurrent : 0,
-			currentWeek : 0,
-			schedule_days : $(),
-			body_width : 0,
-			day_width : 0,
-			day_container : $('.b-schedule__day-container', layout_exist),
-			day_container_offsetLeft : 0,
-			progress : $('.b-progress__container', layout_exist),
-			event_info : {
-				elems : {
-					startTime : {
-						elem : $('.b-event-info__startTime', layout_exist),
-						defaultval : "ЧЧ:ММ"
+		if (!Schedule.Data) {
+			Schedule.Data = {
+				DaysOfWeek : ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"],
+				DaysOfWeekFull : ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"],
+				MonthsFull : ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"],
+				Months : ["янв", "фев", "марта", "апр", "мая", "июня", "июля", "авг", "сент", "окт", "нояб", "дек"],
+				startDate : null,
+				endDate : null,
+				startDateDay : null,
+				endDateDay : null,
+				firstDate : null,
+				duration : 0,
+				weeks : 0,
+				daysToCurrent : 0,
+				weeksToCurrent : 0,
+				currentWeek : 0,
+				schedule_days : $(),
+				body_width : 0,
+				day_width : 0,
+				day_container : $('.b-schedule__day-container', layout_exist),
+				day_container_offsetLeft : 0,
+				progress : $('.b-progress__container', layout_exist),
+				event_info : {
+					elems : {
+						startTime : {
+							elem : $('.b-event-info__startTime', layout_exist),
+							defaultval : "ЧЧ:ММ"
+						},
+						endTime : {
+							elem : $('.b-event-info__endTime', layout_exist),
+							defaultval : "ЧЧ:ММ"
+						},
+						reporter : {
+							elem : $('.b-event-info__item_reporter', layout_exist),
+							defaultval : "Докладчик"
+						},
+						title : {
+							elem : $('.b-event-info__item_title', layout_exist),
+							defaultval : "Тема доклада"
+						},
+						description : {
+							elem : $('.b-event-info__item_description', layout_exist),
+							defaultval : "Описание"
+						},
+						yaru : {
+							elem : $('.b-event-info__link_yaru', layout_exist),
+							defaultval : "http://clubs.ya.ru/"
+						},
+						presentation : {
+							elem : $('.b-event-info__link_presentation', layout_exist),
+							defaultval : "http://yadi.sk/"
+						},
+						video : {
+							elem : $('.b-event-info__link_video', layout_exist),
+							defaultval : "http://static.video.yandex.ru/"
+						},
+						video_download : {
+							elem : $('.b-event-info__link_video-download', layout_exist), 
+							defaultval : "http://yadi.sk/"
+						}
 					},
-					endTime : {
-						elem : $('.b-event-info__endTime', layout_exist),
-						defaultval : "ЧЧ:ММ"
+					elem : $('.b-event-info', layout_exist),
+					width : 0,
+					date : null,
+					day : null,
+					pos : -1,
+					event : null,
+					event_index : 0,
+					pannel : $('.b-event-info__pannel', layout_exist),
+					close_btn : $('.b-event-info__close', layout_exist),
+					extra_callback : undefined,
+					open : function(callback) {
+						this.container_resize('-');
+						this.elem.animate({'width':this.width}, 400, callback);
 					},
-					reporter : {
-						elem : $('.b-event-info__item_reporter', layout_exist),
-						defaultval : "Докладчик"
+					close : function(callback) {
+						this.container_resize('+');
+						this.pos = -1;
+						if (this.extra_callback != undefined) {
+							this.elem.animate({'width':0}, 400, function() {
+								if (callback != undefined) callback();
+								Schedule.Data.event_info.extra_callback();
+							})
+						} else {
+							this.elem.animate({'width':0}, 400, callback);
+						}
 					},
-					title : {
-						elem : $('.b-event-info__item_title', layout_exist),
-						defaultval : "Тема доклада"
-					},
-					description : {
-						elem : $('.b-event-info__item_description', layout_exist),
-						defaultval : "Описание"
-					},
-					yaru : {
-						elem : $('.b-event-info__link_yaru', layout_exist),
-						defaultval : "http://clubs.ya.ru/"
-					},
-					presentation : {
-						elem : $('.b-event-info__link_presentation', layout_exist),
-						defaultval : "http://yadi.sk/"
-					},
-					video : {
-						elem : $('.b-event-info__link_video', layout_exist),
-						defaultval : "http://static.video.yandex.ru/"
-					},
-					video_download : {
-						elem : $('.b-event-info__link_video-download', layout_exist), 
-						defaultval : "http://yadi.sk/"
+					container_resize : function(dir) {
+						if (this.pos%7>4) {
+							Schedule.Data.day_container.animate({'left':dir+'='+(this.pos%7-4)*Schedule.Data.day_width}, 400, function() {
+								Schedule.Data.day_container_offsetLeft = Schedule.Data.day_container.offset().left;
+							});
+						};
 					}
-				},
-				elem : $('.b-event-info', layout_exist),
-				width : 0,
-				date : null,
-				day : null,
-				pos : -1,
-				event : null,
-				event_index : 0,
-				pannel : $('.b-event-info__pannel', layout_exist),
-				close_btn : $('.b-event-info__close', layout_exist),
-				extra_callback : undefined,
-				open : function(callback) {
-					this.container_resize('-');
-					this.elem.animate({'width':this.width}, 400, callback);
-				},
-				close : function(callback) {
-					this.container_resize('+');
-					this.pos = -1;
-					if (this.extra_callback != undefined) {
-						this.elem.animate({'width':0}, 400, function() {
-							if (callback != undefined) callback();
-							Schedule.Data.event_info.extra_callback();
-						})
-					} else {
-						this.elem.animate({'width':0}, 400, callback);
-					}
-				},
-				container_resize : function(dir) {
-					if (this.pos%7>4) {
-						Schedule.Data.day_container.animate({'left':dir+'='+(this.pos%7-4)*Schedule.Data.day_width}, 400, function() {
-							Schedule.Data.day_container_offsetLeft = Schedule.Data.day_container.offset().left;
-						});
-					};
 				}
 			}
 		};
-		
+		Schedule.Data.startDate = new Date(Schedule.fromStorage.startDate);
+		Schedule.Data.endDate = new Date(Schedule.fromStorage.endDate);
 		Schedule.Data.startDateDay = Schedule.Data.startDate.getRuDay();
 		Schedule.Data.endDateDay = Schedule.Data.endDate.getRuDay();
 		Schedule.Data.duration = (Schedule.Data.endDate-Schedule.Data.startDate)/(1000*60*60*24) + 1;
@@ -183,15 +187,29 @@ $(function() {
 			.click(function() {
 				Schedule.Data.event_info.close();
 			});
-		if (Schedule.Data.weeksToCurrent>0 && Schedule.Data.weeksToCurrent<=Schedule.Data.weeks) {
+		if (Schedule.Data.weeksToCurrent>0 && Schedule.Data.weeksToCurrent<=Schedule.Data.weeks-1) {
 			Day_container_move(Schedule.Data.weeksToCurrent, true);
 		}
 		layout_exist.fadeIn(500);
 		Schedule.Data.day_container_offsetLeft = Schedule.Data.day_container.offset().left;
 	};
+	function Schedule_unset() {
+		Schedule.Data.schedule_days.remove();
+		Schedule.Data.progress.empty();
+		$('.b-nav__nav-unit').unbind();
+		Schedule.Data.event_info.close_btn.unbind();
+		layout_exist.fadeOut(500, function() {
+			layout_empty.fadeIn(500);
+		});
+		state = 'empty';
+	};
 	function Admin_init(stage, unset) {
 		if (!Admin.controls) {
 			Admin.controls = {
+				delete_schedule : $('<div class="b-admin b-admin_delete-schedule">\
+					<span class="b-admin__form-control b-admin__form-control_delete">Удалить расписание</span>\
+					</div>'
+					),
 				new_schedule : {
 					create_new : $('<span class="b-admin__create-new">+</span>'),
 					edit_form : $('<div class="b-admin__edit-form">\
@@ -225,15 +243,35 @@ $(function() {
 							.fadeIn(200);
 					})
 				});
-			$.datepicker.setDefaults($.datepicker.regional['']);
+			$.datepicker.regional['ru'] = {
+				closeText: 'Закрыть',
+				prevText: '&#x3c;Пред',
+				nextText: 'След&#x3e;',
+				currentText: 'Сегодня',
+				monthNames: ['Январь','Февраль','Март','Апрель','Май','Июнь',
+				'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
+				monthNamesShort: ['Янв','Фев','Мар','Апр','Май','Июн',
+				'Июл','Авг','Сен','Окт','Ноя','Дек'],
+				dayNames: ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'],
+				dayNamesShort: ['вск','пнд','втр','срд','чтв','птн','сбт'],
+				dayNamesMin: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
+				weekHeader: 'Не',
+				dateFormat: 'dd.mm.yy',
+				firstDay: 1,
+				isRTL: false,
+				showMonthAfterYear: false,
+				yearSuffix: ''
+			};
+			$.datepicker.setDefaults($.datepicker.regional['ru']);
 			Admin.controls.new_schedule.edit_form
 				.find('.b-admin__date-input')
-				.datepicker($.datepicker.regional['ru']);
+				.datepicker();
 			$('.b-admin__form-control_cancel', Admin.controls.new_schedule.edit_form)
 				.click(function() {
 					Admin.controls.new_schedule.edit_form.fadeOut(200, function() {
 						Admin.controls.new_schedule.create_new.fadeIn(200);
-					})
+					});
+					return false;
 				});
 			$('.b-admin__form-control_create', Admin.controls.new_schedule.edit_form)
 				.click(function() {
@@ -250,9 +288,11 @@ $(function() {
 					};
 					StoreSave();
 					layout_empty.fadeOut(200, function() {
+						Admin.controls.new_schedule.edit_form.fadeOut(0);
+						Admin.controls.new_schedule.create_new.fadeIn(0);
 						Admin_unset(state);
 						Schedule_init();
-						Admin_init('exist')
+						Admin_init(state)
 					});
 					return false;
 				});
@@ -348,9 +388,7 @@ $(function() {
 					}
 					if (index != Admin.controls.add_event.day) {
 						Admin.controls.add_event.day = index;
-						var day = Schedule.Data.day_container
-							.find('.b-day')
-							.eq(index);
+						var day = Schedule.Data.schedule_days.eq(index);
 						if (!day.hasClass('b-day_skip')) {
 							Admin.controls.add_event.elem
 								.appendTo(day);
@@ -364,6 +402,20 @@ $(function() {
 					Admin.controls.add_event.elem.show(0);
 				})
 
+		}
+		if (!Admin.header_control) {
+			Admin.header_control = true;
+			Admin.controls.delete_schedule
+				.click(function() {
+					if (state == 'empty') return alert("Расписания и нет");
+					if (confirm("Вы действительно хотите удалить все расписание?")) {
+						Admin_unset(state)
+						Schedule_unset();
+						Admin_init(state);
+						delete store['Schedule'];
+					}
+				})
+				.appendTo(Header);
 		}
 	};
 	function Admin_unset(stage) {
@@ -388,6 +440,8 @@ $(function() {
 			Schedule.Data.day_container
 				.unbind();
 		}
+		Admin.header_control = false;
+		Admin.controls.delete_schedule.remove();
 	}
 	function BuildDay(date, week, dayInWeek) {
 		var classes = '';
