@@ -180,7 +180,8 @@ $(function() {
 			.click(function() {
 				Schedule.Data.event_info.close();
 			});
-		if ((new Date() > Schedule.Data.startDate) && (new Date() < Schedule.Data.endDate)) {
+		//if ((new Date() > Schedule.Data.startDate) && (new Date() < Schedule.Data.endDate)) {
+		if (Schedule.Data.weeksToCurrent>0 && Schedule.Data.weeksToCurrent<=Schedule.Data.weeks) {
 			Day_container_move(Schedule.Data.weeksToCurrent, true);
 		}
 		layout_exist.fadeIn(500);
@@ -294,7 +295,6 @@ $(function() {
 					}
 				});
 			function create_save_event(act) {
-				//нужна проверка значений
 				var event_day = Schedule.Data.event_info.day;
 				var new_event = {
 					date : event_day.data('date').getTime(),
@@ -439,7 +439,9 @@ $(function() {
 		return progressWeek;
 	};
 	function ValidEvent(event) {
-		if (parseInt(event.startTime.replace(/(\d{2}):(\d{2})/, '$1$2'))<parseInt(event.endTime.replace(/(\d+):(\d+)/, '$1$2'))) {
+		var startTime = parseInt(event.startTime.replace(/(\d{2}):(\d{2})/, '$1$2'));
+		var endTime = parseInt(event.endTime.replace(/(\d{2}):(\d{2})/, '$1$2'));
+		if (startTime>0 && startTime<2459 && endTime>0 && endTime<2459 && startTime<endTime) {
 			if (event.reporter != '' && event.title != '') {
 				if (event.description == '') delete(event.description);
 				if (event.yaru == '') delete(event.yaru);
@@ -492,6 +494,7 @@ $(function() {
 			Schedule.Data.event_info.pos = pos;
 			Schedule.Data.event_info.day = day;
 			Schedule.Data.event_info.event = event;
+			alert(Schedule.Data.event_info.event);
 			Schedule.Data.event_info.event_index = index;
 			Schedule.Data.event_info.elem
 				.insertAfter(day);
