@@ -377,8 +377,12 @@ $(function() {
 					.attr('contenteditable','false')
 					.toggleClass('b-event-info__item_editable');
 			});
+			if (Admin.controls.edit_event.hasClass('b-admin__edit-event_create'))
+				Admin.controls.add_event.elem.click();
 			Admin.controls.edit_event
 				.remove();
+			Admin.controls.add_event.elem
+				.remove()
 			Schedule.Data.day_container
 				.unbind();
 		}
