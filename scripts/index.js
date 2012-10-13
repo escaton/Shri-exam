@@ -7,7 +7,7 @@ $(function() {
 			if (admin_check.prop('checked')) {
 				Admin_init(state);
 			} else {
-				Admin_unset();
+				Admin_unset(state);
 			}
 		});
 	if ('localStorage' in window && window['localStorage'] !== null) {
@@ -186,7 +186,7 @@ $(function() {
 		layout_exist.fadeIn(500);
 		Schedule.Data.day_container_offsetLeft = Schedule.Data.day_container.offset().left;
 	};
-	function Admin_init(stage) {
+	function Admin_init(stage, unset) {
 		if (!Admin.controls) {
 			Admin.controls = {
 				new_schedule : {
@@ -247,6 +247,7 @@ $(function() {
 					};
 					StoreSave();
 					layout_empty.fadeOut(200, function() {
+						Admin_unset(state);
 						Schedule_init();
 						Admin_init('exist')
 					});
@@ -330,8 +331,7 @@ $(function() {
 			$.each(Schedule.Data.event_info.elems, function(index, item) {
 				item.elem
 					.attr('contenteditable','true')
-					.toggleClass('b-event-info__item_editable')
-					.text(item.defaultval);
+					.toggleClass('b-event-info__item_editable');
 			});
 			Schedule.Data.event_info.elem.append(Admin.controls.edit_event);
 			Schedule.Data.day_container
@@ -364,8 +364,24 @@ $(function() {
 
 		}
 	};
-	function Admin_unset() {
-
+	function Admin_unset(stage) {
+		if (stage=='empty') {
+			Admin.controls.new_schedule.edit_form
+				.find('.b-admin__date-input')
+				.datepicker('destroy');
+			$('.b-admin_new-schedule', layout_empty)
+				.remove();
+		} else {
+			$.each(Schedule.Data.event_info.elems, function(index, item) {
+				item.elem
+					.attr('contenteditable','false')
+					.toggleClass('b-event-info__item_editable');
+			});
+			Admin.controls.edit_event
+				.remove();
+			Schedule.Data.day_container
+				.unbind();
+		}
 	}
 	function BuildDay(date, week, dayInWeek) {
 		var classes = '';
