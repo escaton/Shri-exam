@@ -51,6 +51,7 @@ $(function() {
 			day_width : 0,
 			day_container : $('.b-schedule__day-container', layout_exist),
 			day_container_offsetLeft : 0,
+			progress : $('.b-progress__container', layout_exist),
 			event_info : {
 				elems : {
 					startTime : {
@@ -123,8 +124,7 @@ $(function() {
 						});
 					};
 				}
-			},
-			progress : $('.b-progress', layout_exist)
+			}
 		};
 		
 		Schedule.Data.startDateDay = Schedule.Data.startDate.getRuDay();
@@ -143,7 +143,10 @@ $(function() {
 		Schedule.Data.event_info.pannel.width(Schedule.Data.event_info.width);
 		Schedule.Data.day_container.width(Schedule.Data.body_width*Schedule.Data.weeks + Schedule.Data.event_info.width);
 		layout_exist.css({'visibility':'visible','display':'none'});
-
+		$('.b-progress__Date_start', layout_exist)
+			.text(Schedule.Data.startDate.getDate()+' '+Schedule.Data.MonthsFull[Schedule.Data.startDate.getMonth()]);
+		$('.b-progress__Date_end', layout_exist)
+			.text(Schedule.Data.endDate.getDate()+' '+Schedule.Data.MonthsFull[Schedule.Data.endDate.getMonth()]);
 		for (var week=0; week<Schedule.Data.weeks; week++) {
 			for (var dayInWeek=0; dayInWeek<7; dayInWeek++) {
 				var date = GetShiftedDate(Schedule.Data.firstDate, dayInWeek+week*7);
@@ -180,7 +183,6 @@ $(function() {
 			.click(function() {
 				Schedule.Data.event_info.close();
 			});
-		//if ((new Date() > Schedule.Data.startDate) && (new Date() < Schedule.Data.endDate)) {
 		if (Schedule.Data.weeksToCurrent>0 && Schedule.Data.weeksToCurrent<=Schedule.Data.weeks) {
 			Day_container_move(Schedule.Data.weeksToCurrent, true);
 		}
@@ -484,7 +486,10 @@ $(function() {
 	};
 	function Show_event_details(day, event, index) {
 		var pos = Schedule.Data.schedule_days.index(day);
-		if (((pos == Schedule.Data.event_info.pos && !event) || (event == Schedule.Data.event_info.event && event)) && Schedule.Data.event_info.pos>-1) {
+		if (((pos == Schedule.Data.event_info.pos && !event)
+			|| (event == Schedule.Data.event_info.event && event))
+			&& Schedule.Data.event_info.pos>-1
+			) {
 			return Schedule.Data.event_info.close();
 		}
 		Schedule.Data.event_info.date = day.data('date');
@@ -494,7 +499,6 @@ $(function() {
 			Schedule.Data.event_info.pos = pos;
 			Schedule.Data.event_info.day = day;
 			Schedule.Data.event_info.event = event;
-			alert(Schedule.Data.event_info.event);
 			Schedule.Data.event_info.event_index = index;
 			Schedule.Data.event_info.elem
 				.insertAfter(day);
