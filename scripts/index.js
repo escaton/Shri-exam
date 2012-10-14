@@ -8,7 +8,7 @@ $(function() {
 			if (admin_check.prop('checked')) {
 				Admin_init(state);
 			} else {
-				Admin_unset(state);
+				Admin_unset(state, true);
 			}
 		})
 	if ('localStorage' in window && window['localStorage'] !== null) {
@@ -198,18 +198,47 @@ $(function() {
 		Schedule.Data.progress.empty();
 		$('.b-nav__nav-unit').unbind();
 		Schedule.Data.event_info.close_btn.unbind();
-		layout_exist.fadeOut(500, function() {
-			layout_empty.fadeIn(500);
-		});
 		state = 'empty';
 	};
 	function Admin_init(stage, unset) {
 		if (!Admin.controls) {
 			Admin.controls = {
-				delete_schedule : $('<div class="b-admin b-admin_delete-schedule">\
-					<span class="b-admin__form-control b-admin__form-control_delete">Удалить расписание</span>\
-					</div>'
-					),
+				header : {
+					container : $('<div class="b-admin b-admin_header"></div>'),
+					delete_schedule : $('<div class="b-admin__form-controls">\
+						<span class="b-admin__form-control b-admin__form-control_delete">Удалить расписание</span>\
+						</div>'
+						),
+					import_export : $('<div class="b-admin__form-controls">\
+						<span class="b-admin__form-control b-admin__form-control_import-export">Импорт/Экспорт</span>\
+						</div>'
+						),
+					import_export_form : {
+						elem : $('<div class="b-admin__import-export-form">\
+							<textarea class="b-admin__form-control_text"></textarea>\
+							<div class="b-admin__form-controls">\
+							<a href="#" class="b-admin__form-control b-admin__form-control_import">Импортировать</a>\
+							<a href="#" class="b-admin__form-control b-admin__form-control_cancel">Отмена</a>\
+							</div>\
+							</div>'
+							),
+						closed : true,
+						open : function() {
+							if (this.closed) {
+								this.elem
+									.addClass('b-admin__import-export-form_show')
+								this.closed = false;
+							}
+						},
+						close : function() {
+							if (!this.closed) {
+								this.elem
+									.removeClass('b-admin__import-export-form_show')
+								this.closed = true;
+							}
+						}
+					}
+				},
 				new_schedule : {
 					create_new : $('<span class="b-admin__create-new">+</span>'),
 					edit_form : $('<div class="b-admin__edit-form">\
@@ -248,10 +277,8 @@ $(function() {
 				prevText: '&#x3c;Пред',
 				nextText: 'След&#x3e;',
 				currentText: 'Сегодня',
-				monthNames: ['Январь','Февраль','Март','Апрель','Май','Июнь',
-				'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
-				monthNamesShort: ['Янв','Фев','Мар','Апр','Май','Июн',
-				'Июл','Авг','Сен','Окт','Ноя','Дек'],
+				monthNames: ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
+				monthNamesShort: ['Янв','Фев','Мар','Апр','Май','Июн', 'Июл','Авг','Сен','Окт','Ноя','Дек'],
 				dayNames: ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'],
 				dayNamesShort: ['вск','пнд','втр','срд','чтв','птн','сбт'],
 				dayNamesMin: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
@@ -278,6 +305,13 @@ $(function() {
 					var date1 = new Date($(".b-admin__date-input_start", Admin.controls.new_schedule.edit_form).val().replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
 					var date2 = new Date($(".b-admin__date-input_end", Admin.controls.new_schedule.edit_form).val().replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
 					if (date2<date1) {
+						alert("Что-то не так с датами");
+						return false;
+					}
+					if (!ValidDates(
+						$(".b-admin__date-input_start", Admin.controls.new_schedule.edit_form).val().replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'),
+						$(".b-admin__date-input_end", Admin.controls.new_schedule.edit_form).val().replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1')
+						)) {
 						alert("Что-то не так с датами");
 						return false;
 					}
@@ -350,7 +384,7 @@ $(function() {
 					video : Schedule.Data.event_info.elems.video.elem.text(),
 					video_download : Schedule.Data.event_info.elems.video_download.elem.text()
 				};
-				if (!ValidEvent(new_event)) return false;
+				if (!ValidEvent(new_event, true)) return false;
 				if (act == 'create') {
 					if (!Schedule.fromStorage.days[new_event.date])
 						Schedule.fromStorage.days[new_event.date] = [];
@@ -405,20 +439,100 @@ $(function() {
 		}
 		if (!Admin.header_control) {
 			Admin.header_control = true;
-			Admin.controls.delete_schedule
+			Admin.controls.header.delete_schedule
+				.find('.b-admin__form-control_delete')
 				.click(function() {
 					if (state == 'empty') return alert("Расписания и нет");
 					if (confirm("Вы действительно хотите удалить все расписание?")) {
 						Admin_unset(state)
 						Schedule_unset();
+						layout_exist.fadeOut(500, function() {
+							layout_empty.fadeIn(500);
+						});
 						Admin_init(state);
 						delete store['Schedule'];
 					}
-				})
+					return false;
+				});
+			Admin.controls.header.import_export
+				.find('.b-admin__form-control_import-export')
+				.click(function() {
+					if (Admin.controls.header.import_export_form.closed) {
+						Admin.controls.header.import_export_form.open();
+						Admin.controls.header.import_export_form.elem
+							.find('.b-admin__form-control_text')
+							.val(store['Schedule'])
+							.focus()
+							.select();
+					} else {
+						Admin.controls.header.import_export_form.close();
+					}
+				});
+			Admin.controls.header.import_export_form.elem
+				.find('.b-admin__form-control_import')
+				.click(function() {
+					try {
+						var temp = JSON.parse(Admin.controls.header.import_export_form.elem
+							.find('.b-admin__form-control_text')
+							.val());
+						if (ValidDates(temp.startDate,temp.endDate)) {
+							temp.startDate = new Date(temp.startDate);
+							temp.startDate.setHours(0);
+							temp.startDate.setMinutes(0);
+							temp.startDate.setMilliseconds(0);
+							temp.endDate = new Date(temp.endDate);
+							temp.endDate.setHours(0);
+							temp.endDate.setMinutes(0);
+							temp.endDate.setMilliseconds(0);
+							if (temp.days) {
+								$.each(temp.days, function(index, item) {
+									if (new Date(index) < temp.startDate || new Date(index) > temp.endDate) {
+										delete(item)
+									} else {
+										if (ValidDay(item)) {
+											for (var i=0, len=item.length;i<len;i++) {
+												if(!ValidEvent(item[i],true)) throw ''
+											}
+										} else throw ''
+									}
+								})
+							} else throw ''
+							Schedule.fromStorage = temp;
+							StoreSave();
+							Admin.controls.header.import_export_form.close();
+							if (state == 'empty') {
+								layout_empty.fadeOut(200, function() {
+									Admin.controls.new_schedule.edit_form.fadeOut(0);
+									Admin.controls.new_schedule.create_new.fadeIn(0);
+									Admin_unset(state);
+									Schedule_init();
+									Admin_init(state)
+								});
+							} else {
+								Admin_unset(state);
+								Schedule_unset();
+								Schedule_init();
+								Admin_init(state);
+							}
+						} else throw ''
+					} catch(e) {
+						alert('Невалидные данные');
+					}
+				});
+			Admin.controls.header.import_export_form.elem
+				.find('.b-admin__form-control_cancel')
+				.click(function() {
+					Admin.controls.header.import_export_form.close()
+				});
+			Admin.controls.header.container
+				.append(
+					Admin.controls.header.delete_schedule,
+					Admin.controls.header.import_export.append(Admin.controls.header.import_export_form.elem)
+				)
 				.appendTo(Header);
 		}
 	};
-	function Admin_unset(stage) {
+	function Admin_unset(stage, all) {
 		if (stage=='empty') {
 			Admin.controls.new_schedule.edit_form
 				.find('.b-admin__date-input')
@@ -440,8 +554,10 @@ $(function() {
 			Schedule.Data.day_container
 				.unbind();
 		}
-		Admin.header_control = false;
-		Admin.controls.delete_schedule.remove();
+		if (all) {
+			Admin.header_control = false;
+			Admin.controls.header.container.remove();
+		}
 	}
 	function BuildDay(date, week, dayInWeek) {
 		var classes = '';
@@ -494,11 +610,11 @@ $(function() {
 		}
 		return progressWeek;
 	};
-	function ValidEvent(event) {
+	function ValidEvent(event, verbose) {
 		var startTime = parseInt(event.startTime.replace(/(\d{2}):(\d{2})/, '$1$2'));
 		var endTime = parseInt(event.endTime.replace(/(\d{2}):(\d{2})/, '$1$2'));
 		if (startTime>0 && startTime<2459 && endTime>0 && endTime<2459 && startTime<endTime) {
-			if (event.reporter != '' && event.title != '') {
+			if (event.reporter != '' && event.title != '' && event.title && event.reporter) {
 				if (event.description == '') delete(event.description);
 				if (event.yaru == '') delete(event.yaru);
 				if (event.presentation == '') delete(event.presentation);
@@ -506,23 +622,26 @@ $(function() {
 				if (event.video_download == '') delete(event.video_download);
 				return true;
 			}
-			alert("Не заполнены поля 'докладчик' и/или 'тема доклада'");
+			if (verbose) alert("Не заполнены поля 'докладчик' и/или 'тема доклада'");
 			return false;
 		}
-		alert("Что-то не так с временем");
+		if (verbose) alert("Что-то не так с временем");
 		return false;
 	};
 	function ValidDay(events,verbose) {
 		events.sort(function(a,b) {
 			return parseInt(a.startTime.replace(/(\d{2}):(\d{2})/, '$1$2'))-parseInt(b.startTime.replace(/(\d+):(\d+)/, '$1$2'));
 		})
-		for(var i=0; i<events.length-1; i++) {
+		for(var i=0, len=events.length-1; i<len; i++) {
 			if (parseInt(events[i].endTime.replace(/(\d{2}):(\d{2})/, '$1$2'))>parseInt(events[i+1].startTime.replace(/(\d+):(\d+)/, '$1$2'))) {
 				if (verbose) alert("Это время уже занято");
 				return false;
 			}
 		}
 		return true;
+	};
+	function ValidDates(date1,date2) {
+		return ((new Date(date1) < new Date(date2)) && date1 && date2);
 	};
 	function GetShiftedDate(start, diff) {
 		return new Date(start.getTime()+diff*(1000*60*60*24));
