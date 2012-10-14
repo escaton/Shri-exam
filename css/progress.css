@@ -1,0 +1,48 @@
+.b-progress {
+	position: relative;
+}
+
+.b-progress__Date {
+	position: absolute;
+	bottom:-20px;
+	color:#ccc;
+}
+
+.b-progress__Date_start {
+	left:0;
+}
+
+.b-progress__Date_end {
+	right:0;
+}
+
+.b-progress__container {
+	box-shadow: 0px 0 20px -5px #000;
+	height:15px;
+	margin:20px 0;
+	position: relative;
+	border-radius:10px;
+	overflow:hidden;
+}
+
+.b-progress__week {
+	box-sizing:border-box;
+	-moz-box-sizing:border-box;
+	background: #999;
+	border-left:1px solid #333;
+	border-bottom: 1px solid #333;
+	box-shadow: inset 0px -8px 20px -10px #000;
+	height:100%;
+	float:left;
+	position: relative;
+	cursor:pointer;
+}
+
+.b-progress__week_current {
+	background: #415F96;
+	border-top: 1px solid #456399;
+}
+
+.b-progress__week_prev {
+	background: #ccc;
+}
