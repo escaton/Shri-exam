@@ -78,19 +78,19 @@ $(function() {
 						},
 						yaru : {
 							elem : $('.b-event-info__link_yaru', layout_exist),
-							defaultval : "http://clubs.ya.ru/"
+							defaultval : ""
 						},
 						presentation : {
 							elem : $('.b-event-info__link_presentation', layout_exist),
-							defaultval : "http://yadi.sk/"
+							defaultval : ""
 						},
 						video : {
 							elem : $('.b-event-info__link_video', layout_exist),
-							defaultval : "http://static.video.yandex.ru/"
+							defaultval : ""
 						},
 						video_download : {
 							elem : $('.b-event-info__link_video-download', layout_exist), 
-							defaultval : "http://yadi.sk/"
+							defaultval : ""
 						}
 					},
 					elem : $('.b-event-info', layout_exist),
@@ -611,9 +611,9 @@ $(function() {
 		return progressWeek;
 	};
 	function ValidEvent(event, verbose) {
-		var startTime = parseInt(event.startTime.replace(/(\d{2}):(\d{2})/, '$1$2'));
-		var endTime = parseInt(event.endTime.replace(/(\d{2}):(\d{2})/, '$1$2'));
-		if (startTime>0 && startTime<2459 && endTime>0 && endTime<2459 && startTime<endTime) {
+		var startTime = ValidTime(event.startTime);
+		var endTime = ValidTime(event.endTime);
+		if (startTime && endTime && startTime<endTime) {
 			if (event.reporter != '' && event.title != '' && event.title && event.reporter) {
 				if (event.description == '') delete(event.description);
 				if (event.yaru == '') delete(event.yaru);
@@ -643,6 +643,12 @@ $(function() {
 	function ValidDates(date1,date2) {
 		return ((new Date(date1) < new Date(date2)) && date1 && date2);
 	};
+	function ValidTime(time) {
+		var temp = /^(\d{2}):(\d{2})$/.exec(time);
+		if (temp != null && temp[1]>=0 && temp[1]<24 && temp[2]>=0 && temp[2]<60)
+			return temp[1]*100+temp[2];
+		return false;
+	}
 	function GetShiftedDate(start, diff) {
 		return new Date(start.getTime()+diff*(1000*60*60*24));
 	};
