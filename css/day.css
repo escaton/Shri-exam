@@ -50,3 +50,7 @@
 	font-size:80%;
 	color:#999;
 }
+
+.b-print {
+	display:none;
+}

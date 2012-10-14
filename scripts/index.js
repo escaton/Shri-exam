@@ -12,11 +12,11 @@ $(function() {
 			}
 		})
 	if ('localStorage' in window && window['localStorage'] !== null) {
-		var store = window.localStorage;
+		var store = localStorage;
 		 Schedule = {};
 		var Admin = {};
 		var state;
-		if (store.getItem('Schedule')) {
+		if (localStorage.Schedule) {
 			layout_empty.hide(0);
 			Schedule_init();	
 		} else {
@@ -195,6 +195,7 @@ $(function() {
 	};
 	function Schedule_unset() {
 		Schedule.Data.schedule_days.remove();
+		$('.b-print').remove();
 		Schedule.Data.progress.empty();
 		$('.b-nav__nav-unit').unbind();
 		Schedule.Data.event_info.close_btn.unbind();
@@ -400,7 +401,13 @@ $(function() {
 				end_edit_event(event_day, events);
 			};
 			function end_edit_event(event_day, events) {
-				BuildEvents(event_day.find('.b-event').remove().end(), events);
+				event_day
+					.find('.b-event')
+					.remove();
+				event_day
+					.nextAll('.b-print')
+					.empty();
+				BuildEvents(event_day, events);
 				StoreSave();
 				Schedule.Data.event_info.close();
 			}
@@ -546,7 +553,7 @@ $(function() {
 					.toggleClass('b-event-info__item_editable');
 			});
 			if (Admin.controls.edit_event.hasClass('b-admin__edit-event_create'))
-				Admin.controls.add_event.elem.click();
+				Schedule.Data.event_info.close();
 			Admin.controls.edit_event
 				.remove();
 			Admin.controls.add_event.elem
@@ -569,21 +576,29 @@ $(function() {
 		var day = '<div class="b-day'+classes+'" style="width:'+Schedule.Data.day_width+'px">\
 			<div class="b-day__header">'+Schedule.Data.DaysOfWeek[dayInWeek]+'\
 			<span class="b-day__header-date">'+date.getDate()+' '+Schedule.Data.Months[date.getMonth()]+'\
-			</span></div></div>';
-		day = $(day);
+			</span></div>\
+			</div>';
+		day = $(day).data('date', date);
 		var events = Schedule.fromStorage.days[date.getTime()];
 		if (events) {
-			BuildEvents(day,events);
+			BuildEvents(day,events, true);
 		}
-		return day.data('date', date);
+		return day;
 	};
-	function BuildEvents(day,events) {
+	function BuildEvents(day,events,init) {
+		var print = '';
+		var height = 100/(events.length+1);
+		if (height > 30) height = 30;
 		$.each(events, function (index, elem) {
-			var day_event = $('<div class="b-event">\
+			print += '<div class="b-print__event"><span class="b-print__event-time">'+elem.startTime+' — '+elem.endTime+'</span>\
+				<span class="b-print__event-reporter">'+elem.reporter+'</span> — \
+				<span class="b-print__event-title">'+elem.title+'</span></div>';
+			var day_event = $('<div class="b-event" style="height:'+height+'%">\
 				<div class="b-event__time">\
 				'+elem.startTime+' — '+elem.endTime+'</div>\
 				<div class="b-event__title">\
-				'+elem.title+'</div>'
+				'+elem.title+'</div>\
+				</div>'
 				)
 				.data(elem)
 				.appendTo(day);
@@ -592,6 +607,13 @@ $(function() {
 					Show_event_details(day,elem,index);
 				})
 		});
+		if (init) {
+			day.after('<div class="b-print"><span class="b-print__day">'+day.data('date').getDate()+' '+Schedule.Data.MonthsFull[day.data('date').getMonth()]+'</span>'+print+'</div>')
+		} else if (events.length>0) {
+			day.nextAll('.b-print').html(print);
+		} else {
+			day.nextAll('.b-print').remove();
+		}
 	};
 	function BuildProgressWeek(week) {
 		var progressWeek = $('<div>')
@@ -630,10 +652,10 @@ $(function() {
 	};
 	function ValidDay(events,verbose) {
 		events.sort(function(a,b) {
-			return parseInt(a.startTime.replace(/(\d{2}):(\d{2})/, '$1$2'))-parseInt(b.startTime.replace(/(\d+):(\d+)/, '$1$2'));
+			return ValidTime(a.startTime)-ValidTime(b.startTime);
 		})
 		for(var i=0, len=events.length-1; i<len; i++) {
-			if (parseInt(events[i].endTime.replace(/(\d{2}):(\d{2})/, '$1$2'))>parseInt(events[i+1].startTime.replace(/(\d+):(\d+)/, '$1$2'))) {
+			if (ValidTime(events[i].endTime)>ValidTime(events[i+1].startTime)) {
 				if (verbose) alert("Это время уже занято");
 				return false;
 			}
@@ -646,7 +668,7 @@ $(function() {
 	function ValidTime(time) {
 		var temp = /^(\d{2}):(\d{2})$/.exec(time);
 		if (temp != null && temp[1]>=0 && temp[1]<24 && temp[2]>=0 && temp[2]<60)
-			return temp[1]*100+temp[2];
+			return temp[1]+temp[2];
 		return false;
 	}
 	function GetShiftedDate(start, diff) {
@@ -680,7 +702,7 @@ $(function() {
 			Schedule.Data.event_info.event = event;
 			Schedule.Data.event_info.event_index = index;
 			Schedule.Data.event_info.elem
-				.insertAfter(day);
+				.insertAfter(day.eq(0));
 			$.each(Schedule.Data.event_info.elems, function(index, item) {
 				event ? item.elem.text(event[index]) : item.elem.text(item.defaultval);
 			})
