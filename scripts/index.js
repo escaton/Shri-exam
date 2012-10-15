@@ -377,8 +377,8 @@ $(function() {
 				});
 			function create_save_event(act) {
 				var event_day = Schedule.Data.event_info.day;
+				var date = event_day.data('date').getTime();
 				var new_event = {
-					date : event_day.data('date').getTime(),
 					startTime : Schedule.Data.event_info.elems.startTime.elem.text(),
 					endTime : Schedule.Data.event_info.elems.endTime.elem.text(),
 					reporter : Schedule.Data.event_info.elems.reporter.elem.text(),
@@ -391,26 +391,27 @@ $(function() {
 				};
 				if (!ValidEvent(new_event, true)) return false;
 				if (act == 'create') {
-					if (!Schedule.fromStorage.days[new_event.date])
-						Schedule.fromStorage.days[new_event.date] = [];
-					var events = Schedule.fromStorage.days[new_event.date].slice();
+					if (!Schedule.fromStorage.days[date])
+						Schedule.fromStorage.days[date] = [];
+					var events = Schedule.fromStorage.days[date].slice();
 					events.push(new_event);
 					if (!ValidDay(events,true)) return false;
 				} else {
-					var events = Schedule.fromStorage.days[new_event.date].slice();
+					var events = Schedule.fromStorage.days[date].slice();
 					events[Schedule.Data.event_info.event_index] = new_event;
 					if (!ValidDay(events,true)) return false;
 				}
-				Schedule.fromStorage.days[new_event.date] = events;
+				Schedule.fromStorage.days[date] = events;
 				end_edit_event(event_day, events);
 			};
 			function end_edit_event(event_day, events) {
 				event_day
 					.find('.b-event')
-					.remove();
-				event_day
+					.remove()
+					.end()
 					.nextAll('.b-print')
-					.empty();
+					.eq(0)
+					.remove();
 				BuildEvents(event_day, events);
 				StoreSave();
 				Schedule.Data.event_info.close();
@@ -608,16 +609,11 @@ $(function() {
 				.appendTo(day);
 			day_event
 				.click(function() {
-					Show_event_details(day,elem,index);
+					Show_event_details(day.filter('.b-day'),elem,index);
 				})
 		});
-		if (init) {
+		if (events.length>0)
 			day.after('<div class="b-print"><span class="b-print__day">'+day.data('date').getDate()+' '+Schedule.Data.MonthsFull[day.data('date').getMonth()]+'</span>'+print+'</div>')
-		} else if (events.length>0) {
-			day.nextAll('.b-print').html(print);
-		} else {
-			day.nextAll('.b-print').remove();
-		}
 	};
 	function BuildProgressWeek(week) {
 		var progressWeek = $('<div>')
@@ -706,7 +702,7 @@ $(function() {
 			Schedule.Data.event_info.event = event;
 			Schedule.Data.event_info.event_index = index;
 			Schedule.Data.event_info.elem
-				.insertAfter(day.eq(0));
+				.insertAfter(day);
 			$.each(Schedule.Data.event_info.elems, function(index, item) {
 				event ? item.elem.text(event[index]) : item.elem.text(item.defaultval);
 			})
