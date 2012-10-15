@@ -13,7 +13,7 @@ $(function() {
 		})
 	if ('localStorage' in window && window['localStorage'] !== null) {
 		var store = localStorage;
-		 Schedule = {};
+		var Schedule = {};
 		var Admin = {};
 		var state;
 		if (localStorage.Schedule) {
@@ -187,7 +187,11 @@ $(function() {
 			.click(function() {
 				Schedule.Data.event_info.close();
 			});
-		if (Schedule.Data.weeksToCurrent>0 && Schedule.Data.weeksToCurrent<=Schedule.Data.weeks-1) {
+		if (Schedule.Data.weeksToCurrent<0) {
+			Day_container_move(0, true);
+		} else if (Schedule.Data.weeksToCurrent>=Schedule.Data.weeks-1) {
+			Day_container_move(Schedule.Data.weeks-1, true);
+		} else {
 			Day_container_move(Schedule.Data.weeksToCurrent, true);
 		}
 		layout_exist.fadeIn(500);

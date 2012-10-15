@@ -1,12 +1,17 @@
-.b-admin, .b-header, .b-event-info, .b-day__header, .b-event__title, .b-event__time, .b-progress {
+.b-admin, .b-event-info, .b-day__header, .b-event__title, .b-event__time, .b-progress {
 	display: none;
 }
 
 .b-print {
-	font-size:200%;
+	font-size:18px;
 	display: block;
 	border:0px solid red;
 	margin:20px 0;
+}
+
+.b-print_header {
+	border-bottom:1px solid #333;
+	font-size:;
 }
 
 .b-print__day {
@@ -16,7 +21,7 @@
 }
 
 .b-print__event {
-	margin:10px 0 10px 60px;
+	margin:10px 0 10px 40px;
 }
 
 .b-print__event-time {
