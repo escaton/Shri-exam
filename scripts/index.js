@@ -421,7 +421,7 @@ $(function() {
 					.attr('contenteditable','true')
 					.toggleClass('b-event-info__item_editable');
 			});
-			Schedule.Data.event_info.elem.append(Admin.controls.edit_event);
+			Schedule.Data.event_info.pannel.append(Admin.controls.edit_event);
 			Schedule.Data.day_container
 				.mousemove(function(e) {
 					var i = (e.pageX - Schedule.Data.day_container_offsetLeft);
@@ -599,10 +599,10 @@ $(function() {
 				<span class="b-print__event-reporter">'+elem.reporter+'</span> — \
 				<span class="b-print__event-title">'+elem.title+'</span></div>';
 			var day_event = $('<div class="b-event" style="height:'+height+'%">\
-				<div class="b-event__time">\
-				'+elem.startTime+' — '+elem.endTime+'</div>\
-				<div class="b-event__title">\
-				'+elem.title+'</div>\
+				<div class="b-event__header"><div class="b-event__time">\
+				'+elem.startTime+' — '+elem.endTime+'</div></div>\
+				<div class="b-event__body"><div class="b-event__title">\
+				'+elem.title+'</div></div>\
 				</div>'
 				)
 				.data(elem)

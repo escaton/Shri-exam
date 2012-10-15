@@ -41,12 +41,8 @@
 }
 
 .b-admin__edit-event {
-	border:1px solid #7c1212;
-	border-width: 1px 0;
 	padding:10px 0;
 	width:100%;
-	position: absolute;
-	bottom:10px;
 }
 
 .b-admin__create-new {

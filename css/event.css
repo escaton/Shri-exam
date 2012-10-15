@@ -18,20 +18,24 @@
 	background: linear-gradient(to bottom, #d4e4ef 0%,#86aecc 100%);
 }
 
-.b-event__time {
-	-moz-box-sizing:border-box;
-	box-sizing:border-box;
-	padding:10% 10px;
+.b-event__header {
 	text-align: center;
 	height:40%;
 	border-bottom:1px solid #7F80B5;
+	overflow: hidden;
+}
+
+.b-event__time {
+	position: relative;
+	top:50%;
+	margin-top: -7px;
+}
+
+.b-event__body {
+	height:60%;
+	overflow: hidden;
 }
 
 .b-event__title {
-	-moz-box-sizing:border-box;
-	box-sizing:border-box;
-	padding:10% 10px;
-	height:60%;
-	text-overflow:ellipsis;
-	overflow:hidden;
+	margin:10px;
 }

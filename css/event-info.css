@@ -32,6 +32,8 @@
 }
 
 .b-event-info__pannel {
+	overflow:auto;
+	height:100%;
 }
 
 .b-event-info__header {
@@ -61,7 +63,7 @@
 
 .b-event-info__item_editable {
 	outline:1px dashed #999;
-	height:20px;
+	min-height:20px;
 	padding:0 2px;
 }
 
@@ -87,14 +89,12 @@
 
 .b-event-info__item_link {
 	font-size:13px;
+	overflow:hidden;
 }
 
 .b-event-info__link {
+	margin:0 5px;
 	height:15px;
 	overflow:hidden;
 	text-overflow:ellipsis;
-}
-
-.b-event-info__item_editable.b-event-info__link {
-	display: block;
 }
